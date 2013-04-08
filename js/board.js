@@ -27,7 +27,8 @@ var game = {
 
     passant: "-",
 
-    
+    promotionPending: false,
+
     startGame: function(params) {
 
 	 // allows default values 
@@ -54,6 +55,8 @@ var game = {
 
 	 this.loadBoard();
 
+	 this.preparePromotion();
+	 
 
 	 // allow board rotation
 	 $(document).on("keypress", function() {
@@ -80,44 +83,92 @@ var game = {
 	 this.drawSquares(this.size/8);
 
 	 // allow square selection and piece movement
-	 $("#board").on("click", ".square", function() {
-	     var square = $(this);
-	     var selectedSquare = $(".square.selected");
-	     
-	     // if piece selected and movement possible, move it
-	     var end = square.attr("id");
-	     var start = selectedSquare.attr("id");
+	 $("#board").on("click", ".square", this.addBoardEvents);
 
-	     if ( selectedSquare.length === 1 && game.possibleMoves.indexOf(end) !== -1 ) {
-		  game.movePiece(start, end);
-	     }
-	     
-
-	     // select only squares with pieces and is player to move
-	     else {
-		  square.children().each( function(){
-		      var piece = $(this);
-		      if ( piece.hasClass("piece") && ( piece.data("color") === game.player || game.player === "both" ) && piece.data("color") === game.turn ) {
-			   square.addClass("selected");
-
-			   // updates "possibleMoves" for selected piece
-			   var nextTurn = game.turn === "white" ? "black" : "white";
-			   start = square.attr("id");
-			   
-			   game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(square.attr("id"), game.position),nextTurn);
-			   
-			   console.log(game.possibleMoves);
-		      }
-		  });
-	     }
-
-	     // remove selections
-	     selectedSquare.removeClass("selected");
-	     
-	 });
+	 
 	 
     },
 
+    preparePromotion: function() {
+	 $("#table").append("<div id='promotionTable'><div>Promotion</div></div>");
+	 $("#promotionTable").append("<div class='colorPromotionTable' id='whitePromotionTable'></div>");
+	 $("#promotionTable").append("<div class='colorPromotionTable' id='blackPromotionTable'></div>");
+
+	 $("#whitePromotionTable").append("<div class='promotionSquare' id='whitePromotionQueen' data-piece='Q'></div>");
+	 $("#whitePromotionTable").append("<div class='promotionSquare' id='whitePromotionRook' data-piece='R'></div>");
+	 $("#whitePromotionTable").append("<div class='promotionSquare' id='whitePromotionBishop' data-piece='B'></div>");
+	 $("#whitePromotionTable").append("<div class='promotionSquare' id='whitePromotionKnight' data-piece='N'></div>");
+
+	 $("#blackPromotionTable").append("<div class='promotionSquare' id='blackPromotionQueen' data-piece='q'></div>");
+	 $("#blackPromotionTable").append("<div class='promotionSquare' id='blackPromotionRook' data-piece='r'></div>");
+	 $("#blackPromotionTable").append("<div class='promotionSquare' id='blackPromotionBishop' data-piece='b'></div>");
+	 $("#blackPromotionTable").append("<div class='promotionSquare' id='blackPromotionKnight' data-piece='n'></div>");
+
+	 $("#promotionTable, .colorPromotionTable").hide();
+
+	 
+	 $("#promotionTable").on('click', '.promotionSquare', function() {
+	     
+	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
+
+	     for ( var i = 0; i < 8; i++ ) {
+		  if ( game.position[columnsName[i]+"8"] === "P" ) {
+		      var pSq = $(this);
+		      game.position[columnsName[i]+"8"] = pSq.data("piece");
+		      var square = $("#"+columnsName[i]+"8");
+		      square.children().last().data("piece",  pSq.data("piece"));
+		      square.children().removeClass("P").addClass(pSq.data("piece"));
+		  }
+		  else if ( game.position[columnsName[i]+"1"] === "p" ) {
+		      var pSq = $(this);
+		      game.position[columnsName[i]+"1"] = pSq.data("piece");
+		      var square = $("#"+columnsName[i]+"1");
+		      square.children().last().data("piece",  pSq.data("piece"));
+		      square.children().removeClass("p").addClass(pSq.data("piece"));
+		  }
+	     }
+	     
+	     $("#board").on("click", ".square", game.addBoardEvents);
+	     $("#promotionTable, #whitePromotionTable, #blackPromotionTable").hide();
+	 });
+    },
+    
+
+    addBoardEvents: function() {
+	 var square = $(this);
+	 var selectedSquare = $(".square.selected");
+	 
+	 // if piece selected and movement possible, move it
+	 var end = square.attr("id");
+	 var start = selectedSquare.attr("id");
+	 
+	 if ( selectedSquare.length === 1 && game.possibleMoves.indexOf(end) !== -1 ) {
+	     game.movePiece(start, end);
+	 }
+	 
+
+	 // select only squares with pieces and is player to move
+	 else {
+	     square.children().each( function(){
+		  var piece = $(this);
+		  if ( piece.hasClass("piece") && ( piece.data("color") === game.player || game.player === "both" ) && piece.data("color") === game.turn ) {
+		      square.addClass("selected");
+		      
+		      // updates "possibleMoves" for selected piece
+		      var nextTurn = game.turn === "white" ? "black" : "white";
+		      start = square.attr("id");
+		      
+		      game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(square.attr("id"), game.position),nextTurn);
+		      
+		      console.log(game.possibleMoves);
+		  }
+	     });
+	 }
+
+	 // remove selections
+	 selectedSquare.removeClass("selected");
+	     
+    },
 
     drawSquares: function(squareSize) {
 
@@ -205,6 +256,8 @@ var game = {
 	 $(".previousEnd").removeClass("previousEnd");
 	 $(".previousStart").removeClass("previousStart");
 	 
+
+	 // board update
 	 
 	 //en passant piece removal
 	 if (this.position[start].toLowerCase() === "p" && end === this.passant ) {
@@ -247,6 +300,8 @@ var game = {
 	     else if ( start === "a8" )  this.castling = this.castling.replace("q","");
 	 }
 
+	 // board update
+
 	 // castling 
 	 if ( start === "e1" && this.position[start] === "K") {
 	     if ( end === "g1" ) {
@@ -276,7 +331,7 @@ var game = {
 	 this.position = this.generateNewPosition(start, end, passant);
 	 
 
-	 // actual board update
+	 // board update
 
 	 // normal pick the piece
 	 var start = $("#"+start);
@@ -287,12 +342,11 @@ var game = {
 	 });
 	 
 	 // normal drop the piece
-	 var end = $("#"+end);
-	 end.children().remove();
-	 end.append(piece);
+	 var endSquare = $("#"+end);
+	 endSquare.children().remove();
+	 endSquare.append(piece);
 
 	 
- 
 	 // update turn
 	 this.turn = this.turn === "white" ? "black" : "white";
 
@@ -300,11 +354,29 @@ var game = {
 	 // update log
 
 	 // register the move on the board
-	 end.addClass("previousEnd");
+	 endSquare.addClass("previousEnd");
 	 start.addClass("previousStart");
+	 
+
+	 // deals with promotions
+	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
+	     $("#board").off("click", ".square");
+	     $("#promotionTable").show();
+	     
+	     if ( end[1] === "1" ) {
+		  $("#blackPromotionTable").show();
+	     }
+	     else
+		  $("#whitePromotionTable").show();
+
+	     
+	 }
 	 
     },
 	 
+
+
+
 
     // deletes board and redraws it upside down
     rotateBoard: function() {
