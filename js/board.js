@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    game.startGame({ size: 400, player: "both", orientation: "white", turn: "black", fen: "rnbqkbnr/pppppppp/8/8/nn2k1kk/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" });
+    game.startGame({ size: 400, player: "both", orientation: "black", turn: "white" });
         
 });
 
@@ -23,7 +23,9 @@ var game = {
 
     orientation: "white",
 
+    possibleMoves: [],
 
+    passant: "-",
 
     startGame: function(params) {
 
@@ -76,20 +78,41 @@ var game = {
 	 // draw squares
 	 this.drawSquares(this.size/8);
 
-	 // allow square selection
+	 // allow square selection and piece movement
 	 $("#board").on("click", ".square", function() {
-	     $(".square.selected").removeClass("selected");
-	      
 	     var square = $(this);
+	     var selectedSquare = $(".square.selected");
+
+
+	     // if piece selected and movement possible, move it
+	     var end = square.attr("id");
+	     var start = selectedSquare.attr("id");
+
+	     if ( selectedSquare.length === 1 && game.possibleMoves.indexOf(end) !== -1 ) {
+		  game.movePiece(start, end);
+	     }
 	     
+
 	     // select only squares with pieces and is player to move
-	     square.children().each( function(){
-		  var piece = $(this);
-		  if ( piece.hasClass("piece") && ( piece.data("color") === game.player || game.player === "both" ) && piece.data("color") === game.turn ) {
-		      square.addClass("selected");
-		      game.getPossibleMoves(square.attr("id"));
-		  }
-	     });
+	     else {
+		  square.children().each( function(){
+		      var piece = $(this);
+		      if ( piece.hasClass("piece") && ( piece.data("color") === game.player || game.player === "both" ) && piece.data("color") === game.turn ) {
+			   square.addClass("selected");
+
+			   // updates "possibleMoves" for selected piece
+			   var nextTurn = game.turn === "white" ? "black" : "white";
+			   start = square.attr("id");
+			   
+			   game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(square.attr("id"), game.position),nextTurn);
+			   console.log(game.possibleMoves);
+		      }
+		  });
+	     }
+
+	     // remove selections
+	     selectedSquare.removeClass("selected");
+	     
 	 });
 	 
     },
@@ -165,11 +188,11 @@ var game = {
 
 	     // if piece is white
 	     if ( this.position[k].toUpperCase() === this.position[k] )
-		  $("#"+k).append("<div class='piece "+this.position[k]+"' data-color='white' data-piece='"+this.position[k]+"'></div>");
+		  $("#"+k).append("<div class='piece white "+this.position[k]+"' data-color='white' data-piece='"+this.position[k]+"'></div>");
 
 	     // if piece is black
 	     else 
-		  $("#"+k).append("<div class='piece "+this.position[k]+"' data-color='black' data-piece='"+this.position[k]+"'></div>");
+		  $("#"+k).append("<div class='piece black "+this.position[k]+"' data-color='black' data-piece='"+this.position[k]+"'></div>");
 	     
 	 }
     },
@@ -177,26 +200,58 @@ var game = {
 
     
     movePiece: function(start, end) {
-	 // game log
-	 this.position[end] = this.position[start];
-	 delete this.position[start];
 	 
+	 
+	 //en passant piece removal
+	 if (this.position[start].toLowerCase() === "p" && end === this.passant ) {
+	     
+	     // if white
+	     if ( this.position[start] === "P" ) {
+		  $("#"+[end.split("")[0],5].join("")).children().remove();
+	     }
+	     // if black
+	     else {
+		  $("#"+[end.split("")[0],4].join("")).children().remove();
+	     }
+
+	 }
+	 
+	 var passant = this.passant;
+	 // register passant square
+	 if ( this.position[start] === "P" && start.split("")[1] === "2" && end.split("")[1] === "4" )
+	     this.passant = end.split("")[0]+"3";
+	 else if ( this.position[start] === "p" && start.split("")[1] === "7" && end.split("")[1] === "5" )
+	     this.passant = end.split("")[0]+"6";
+	 else 
+	     this.passant = "-";
+
+
+	 // game position
+	 this.position = this.generateNewPosition(start, end, passant);
+	 
+
 	 // actual board update
 
-	 // picks the piece
+	 // normal pick the piece
 	 var piece = $("#"+start).children().each(function() {
 	     var p = $(this);
 	     if ( p.hasClass("piece") )
 		  p.detach();
 	 });
 	 
-	 // drops the piece
+	 // normal drop the piece
 	 var end = $("#"+end);
 	 end.children().remove();
 	 end.append(piece);
 
 	 // TODO 
-	 // castling and en passant taking
+	 // castling 
+ 
+	 // update turn
+	 this.turn = this.turn === "white" ? "black" : "white";
+
+	 // TODO
+	 // update log
     },
 	 
 
@@ -213,7 +268,7 @@ var game = {
     },
 
 
-    getPossibleMoves: function(square) {
+    getPossibleMoves: function(square, pos) {
 	 
 	 var possibleMoves = [];
 
@@ -224,7 +279,7 @@ var game = {
 
 	 
 	 // ROOK
-	 if ( this.position[square].toUpperCase() === "R"  || this.position[square].toUpperCase() === "Q" ) {
+	 if ( pos[square].toUpperCase() === "R"  || pos[square].toUpperCase() === "Q" ) {
 	     
 	     // movement to the right
 	     y = parseInt(squareArray[1]);
@@ -234,11 +289,11 @@ var game = {
 		  x++;
 
 		  // path is clear
-		  if ( !( columnsName[x]+y in this.position ) )
+		  if ( !( columnsName[x]+y in pos ) )
 		      possibleMoves.push(columnsName[x]+y);
 
 		  // enemy piece
-		  else if ( this.isEnemyPresent(columnsName[x]+y, square) ) {
+		  else if ( this.isEnemyPresent(columnsName[x]+y, square, pos) ) {
 		      possibleMoves.push(columnsName[x]+y); 
 		      break;
 		  }
@@ -256,11 +311,11 @@ var game = {
 		  x--;
 
 		  // path is clear
-		  if ( !( columnsName[x]+y in this.position ) )
+		  if ( !( columnsName[x]+y in pos ) )
 		      possibleMoves.push(columnsName[x]+y);
 
 		  // enemy piece
-		  else if ( this.isEnemyPresent(columnsName[x]+y, square) ) {
+		  else if ( this.isEnemyPresent(columnsName[x]+y, square, pos) ) {
 		      possibleMoves.push(columnsName[x]+y); 
 		      break;
 		  }
@@ -278,11 +333,11 @@ var game = {
 		  y++;
 
 		  // path is clear
-		  if ( !( columnsName[x]+y in this.position ) )
+		  if ( !( columnsName[x]+y in pos ) )
 		      possibleMoves.push(columnsName[x]+y);
 
 		  // enemy piece
-		  else if ( this.isEnemyPresent(columnsName[x]+y, square) ) {
+		  else if ( this.isEnemyPresent(columnsName[x]+y, square, pos) ) {
 		      possibleMoves.push(columnsName[x]+y); 
 		      break;
 		  }
@@ -300,11 +355,11 @@ var game = {
 		  y--;
 
 		  // path is clear
-		  if ( !( columnsName[x]+y in this.position ) )
+		  if ( !( columnsName[x]+y in pos ) )
 		      possibleMoves.push(columnsName[x]+y);
 
 		  // enemy piece
-		  else if ( this.isEnemyPresent(columnsName[x]+y, square) ) {
+		  else if ( this.isEnemyPresent(columnsName[x]+y, square, pos) ) {
 		      possibleMoves.push(columnsName[x]+y); 
 		      break;
 		  }
@@ -318,7 +373,7 @@ var game = {
 	 
 
 	 // BISHOP
-	 if ( this.position[square].toUpperCase() === "B"  || this.position[square].toUpperCase() === "Q" ) {
+	 if ( pos[square].toUpperCase() === "B"  || pos[square].toUpperCase() === "Q" ) {
 	     
 	     // movement to NE
 	     y = parseInt(squareArray[1]);
@@ -329,11 +384,11 @@ var game = {
 		  y++;
 
 		  // path is clear
-		  if ( !( columnsName[x]+y in this.position ) )
+		  if ( !( columnsName[x]+y in pos ) )
 		      possibleMoves.push(columnsName[x]+y);
 
 		  // enemy piece
-		  else if ( this.isEnemyPresent(columnsName[x]+y, square) ) {
+		  else if ( this.isEnemyPresent(columnsName[x]+y, square, pos) ) {
 		      possibleMoves.push(columnsName[x]+y); 
 		      break;
 		  }
@@ -352,11 +407,11 @@ var game = {
 		  y++;
 
 		  // path is clear
-		  if ( !( columnsName[x]+y in this.position ) )
+		  if ( !( columnsName[x]+y in pos ) )
 		      possibleMoves.push(columnsName[x]+y);
 
 		  // enemy piece
-		  else if ( this.isEnemyPresent(columnsName[x]+y, square) ) {
+		  else if ( this.isEnemyPresent(columnsName[x]+y, square, pos) ) {
 		      possibleMoves.push(columnsName[x]+y); 
 		      break;
 		  }
@@ -375,11 +430,11 @@ var game = {
 		  x++;
 
 		  // path is clear
-		  if ( !( columnsName[x]+y in this.position ) )
+		  if ( !( columnsName[x]+y in pos ) )
 		      possibleMoves.push(columnsName[x]+y);
 
 		  // enemy piece
-		  else if ( this.isEnemyPresent(columnsName[x]+y, square) ) {
+		  else if ( this.isEnemyPresent(columnsName[x]+y, square, pos) ) {
 		      possibleMoves.push(columnsName[x]+y); 
 		      break;
 		  }
@@ -398,11 +453,11 @@ var game = {
 		  x--;
 
 		  // path is clear
-		  if ( !( columnsName[x]+y in this.position ) )
+		  if ( !( columnsName[x]+y in pos ) )
 		      possibleMoves.push(columnsName[x]+y);
 
 		  // enemy piece
-		  else if ( this.isEnemyPresent(columnsName[x]+y, square) ) {
+		  else if ( this.isEnemyPresent(columnsName[x]+y, square, pos) ) {
 		      possibleMoves.push(columnsName[x]+y); 
 		      break;
 		  }
@@ -415,7 +470,7 @@ var game = {
 	 }
 
 	 // KNIGHT
-	 if ( this.position[square].toUpperCase() === "N" ) {
+	 if ( pos[square].toUpperCase() === "N" ) {
 	     
 	     // NE movement (2 steps N 1 step E)
 	     y = parseInt(squareArray[1]);
@@ -425,7 +480,7 @@ var game = {
 		  y += 2;
 		  x++;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -437,7 +492,7 @@ var game = {
 		  y += 2;
 		  x--;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -449,7 +504,7 @@ var game = {
 		  y ++;
 		  x += 2;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -461,7 +516,7 @@ var game = {
 		  y ++;
 		  x -= 2;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -473,7 +528,7 @@ var game = {
 		  y --;
 		  x -= 2;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -485,7 +540,7 @@ var game = {
 		  y --;
 		  x += 2;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -497,7 +552,7 @@ var game = {
 		  y -= 2;
 		  x --;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -509,7 +564,7 @@ var game = {
 		  y -= 2;
 		  x ++;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	 }
@@ -517,7 +572,7 @@ var game = {
 
 
 	 // KING
-	 if ( this.position[square].toUpperCase() === "K" ) {
+	 if ( pos[square].toUpperCase() === "K" ) {
 	     
 	     // N movement 
 	     y = parseInt(squareArray[1]);
@@ -526,7 +581,7 @@ var game = {
 	     if ( y < 8 ) { // square is in the board
 		  y ++;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -537,7 +592,7 @@ var game = {
 	     if ( x > 0 ) { // square is in the board
 		  x--;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -548,7 +603,7 @@ var game = {
 	     if ( x < 7 ) { // square is in the board
 		  x++;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -559,7 +614,7 @@ var game = {
 	     if ( y > 1 ) { // square is in the board
 		  y --;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -571,7 +626,7 @@ var game = {
 		  y --;
 		  x --;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -583,7 +638,7 @@ var game = {
 		  y --;
 		  x ++;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -595,7 +650,7 @@ var game = {
 		  y ++;
 		  x ++;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	     
@@ -607,31 +662,193 @@ var game = {
 		  y ++;
 		  x --;
 		  
-		  if ( !( columnsName[x]+y in this.position ) || this.isEnemyPresent(square, columnsName[x]+y) )
+		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
 	 }
 
 
-	 console.log(possibleMoves);
+	 // WHITE PAWN
+	 if ( pos[square] === "P" ) {
+	     
+	     y = parseInt(squareArray[1]);
+	     x = squareArray[0].charCodeAt(0)-97;
+
+	     // 2 squares ahead
+	     if ( y === 2 && !( columnsName[x]+"4" in pos ) ) {
+		  possibleMoves.push(columnsName[x]+"4");
+	     }
+	     
+	     // 1 square ahead
+	     if ( !( columnsName[x]+(y+1) in pos ) ) {
+		  possibleMoves.push(columnsName[x]+(y+1));
+	     }
+
+	     // takes right
+	     if ( x < 7 && ( this.isEnemyPresent(square, columnsName[x+1]+(y+1), pos) || this.passant === columnsName[x+1]+(y+1) )) {
+		  possibleMoves.push(columnsName[x+1]+(y+1));
+	     }
+	     
+	     // takes left
+	     if ( x > 0 && ( this.isEnemyPresent(square, columnsName[x-1]+(y+1), pos) || this.passant === columnsName[x-1]+(y+1) )) {
+		  possibleMoves.push(columnsName[x-1]+(y+1));
+	     }
+	     
+	 }
+
+
+	 // LEFT PAWN
+	 if ( pos[square] === "p" ) {
+	     
+	     y = parseInt(squareArray[1]);
+	     x = squareArray[0].charCodeAt(0)-97;
+
+	     // 2 squares ahead
+	     if ( y === 7 && !( columnsName[x]+"5" in pos ) ) {
+		  possibleMoves.push(columnsName[x]+"5");
+	     }
+	     
+	     // 1 square ahead
+	     if ( !( columnsName[x]+(y-1) in pos ) ) {
+		  possibleMoves.push(columnsName[x]+(y-1));
+	     }
+
+	     // takes left
+	     if ( x < 7 && ( this.isEnemyPresent(square, columnsName[x+1]+(y-1), pos) || this.passant === columnsName[x+1]+(y+-1) )) {
+		  possibleMoves.push(columnsName[x+1]+(y-1));
+	     }
+	     
+	     // takes right
+	     if ( x > 0 && ( this.isEnemyPresent(square, columnsName[x-1]+(y-1), pos) || this.passant === columnsName[x-1]+(y-1) )) {
+		  possibleMoves.push(columnsName[x-1]+(y-1));
+	     }
+	     
+	 }
+
+	 
+	 return possibleMoves;
     },
 
     
-    isEnemyPresent: function(s1, s2) {
-	 var s1L = this.position[s1].toLowerCase();
-	 var s2L = this.position[s2].toLowerCase();
+    // returns a copy of current position
+    copyPosition: function(position) {
+	 var pos = {};
+	 
+	 for ( var i in position )
+	     pos[i] = position[i];
+	 
+	 return pos;
 
-	 if ( s1L === this.position[s1] ) {
-	     if ( s2L === this.position[s2] ) {
+    },
+
+    
+
+
+
+    // returns a copy of current position after a move
+    generateNewPosition: function(start, end, passant) {
+	 var pos = this.copyPosition(this.position);
+	 
+
+	 // replaces piece position
+	 pos[end] = pos[start];
+	 delete pos[start];
+	 
+	 // deletes en passant pawn
+	 if ( end === passant ) {
+	     var endArray = end.split("");
+	     if ( this.turn === "white" ) 
+		  delete pos[[end[0],parseInt(end[1])-1].join("")];
+	     else
+		  delete pos[[end[0],parseInt(end[1])+1].join("")];
+	 }
+
+	 // deals with castling
+	 // TODO
+	 
+	 return pos;
+    },
+
+
+    // checks if position is legal - if white is to move and black king is already in check or vice versa
+    isPositionLegal: function(position,turn) {
+	 
+	 // gets king position
+	 var kingPosition;
+	 for ( var k in position ) {
+	     if ( (turn === "black" && position[k] === "K") || (turn === "white" && position[k] === "k") ) {
+		  kingPosition = k;
+		  break;
+	     }
+	 }
+	 
+	 
+	 for ( var k in position ) {
+	 
+	     var moves = [];
+
+	     // select pieces only from current color
+	     if ( turn === "white" && position[k] === position[k].toUpperCase() ) {
+		  moves = this.getPossibleMoves(k, position);
+	     }
+	     else if ( turn === "black" && position[k] === position[k].toLowerCase() ) {
+		  moves = this.getPossibleMoves(k, position);
+	     }
+
+	     // if king is attacked
+	     if ( moves.indexOf(kingPosition) !== -1 )
+		  return false;
+	 }
+
+	 // king not attacked
+	 return true;
+
+    },
+    
+
+    // remove illegal moves from possible moves
+    filterIllegalMoves: function(start,moves,turn) {
+
+	 var filteredMoves = [];
+	 var newPos;
+
+	 
+	 for ( var i in moves ) {
+	     newPos = this.generateNewPosition(start,moves[i]);
+	     if ( this.isPositionLegal(newPos,turn) )
+		  filteredMoves.push(moves[i]);
+	 }
+
+	 return filteredMoves;
+    },
+
+    
+    // checks if enemy pieces are present at given squares 
+    isEnemyPresent: function(s1, s2, pos) {
+	 
+	 // if no piece is present at location 
+	 if ( !(s1 in pos && s2 in pos) )
+	     return false;
+
+	 // lower case piece version
+	 var s1L = pos[s1].toLowerCase();
+	 var s2L = pos[s2].toLowerCase();
+
+	 // if piece are the same color
+	 if ( s1L === pos[s1] ) {
+	     if ( s2L === pos[s2] ) {
 		  return false;
 	     }
 	 }
-	 else if ( s1L !== this.position[s1] ) {
-	     if ( s2L !== this.position[s2] ) {
+	 else if ( s1L !== pos[s1] ) {
+	     if ( s2L !== pos[s2] ) {
 		  return false;
 	     }
 	 }
 
+	 // if piece are different
 	 return true;
     },
 }
+
+
