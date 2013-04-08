@@ -1,0 +1,179 @@
+$(document).ready(function() {
+    game.startGame("w", 500, "w");
+        
+});
+
+
+
+var game = {
+
+    fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+
+    position: {},
+
+    turn: "",
+
+    result: "active",
+
+    castling: "",
+
+    size: 400,
+
+    orientation: "w",
+
+
+
+    startGame: function(turn, size, orientation, fen) {
+	 if (fen)
+	     this.fen = fen;
+
+	 this.size = size;
+
+	 this.turn = turn;
+
+	 this.orientation = orientation;
+
+	 this.getInitialPosition();
+
+	 this.prepareTable();
+
+	 this.loadBoard();
+
+	 // allow board rotation
+	 $(document).on("keypress", function() {
+	     game.rotateBoard();
+	 });
+
+	 this.drawPieces();
+
+	 this.movePiece("d2", "d4");
+    },
+
+
+    prepareTable: function() {
+	 $("body").append("<div id='table'></div>");
+	 $("#table").css({ width: this.size, height: this.size });
+    },
+
+    
+    loadBoard: function() {
+	 
+	 $("#table").append("<div id='board'></div>");
+    
+	 // draw squares
+	 this.drawSquares(this.size/8);
+
+	 // allow square selection
+	 $("#board").on("click", ".square", function() {
+	     $(".square.selected").removeClass("selected");
+	     $(this).addClass("selected");
+	 });
+	 
+    },
+
+
+    drawSquares: function(squareSize) {
+
+	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
+
+	 for ( var i = 1; i < 9; i++ ) {
+
+	     // 8 squares per row
+	     for ( var j = 0; j < 8; j++ ) {
+	     
+		  // append a square to the board depending on the orientation
+		  if ( this.orientation === "w" )
+		      $("#board").append("<div class='square' id='"+columnsName[j]+i+"'></div>");
+		  else
+		      $("#board").append("<div class='square' id='"+columnsName[7-j]+(9-i)+"'></div>");
+
+		  // choose square position
+		  $(".square").last().css( { left:j*squareSize, top: (8-i)*squareSize } );
+
+		  // choose square color
+		  if ( (i+j)%2 ) 
+		      $(".square").last().addClass("dark");
+		  else
+		      $(".square").last().addClass("light");
+
+	     }
+	 }  
+
+   
+    }, 
+
+
+    getInitialPosition: function() {
+
+	 var fenArray = this.fen.split(" ");
+
+	 var position = fenArray[0].split("/");
+
+	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
+
+	 var y = 8; // starts with row 8
+	 // 8 rows
+	 for ( var row in position ) {
+
+	     var x = 0; // starts with column 'e'
+	     // 8 squares per row
+	     for ( var square in position[row] ) {
+		  
+		  // if piece is in position mark it
+		  if ( isNaN(parseInt(position[row][square])) ) {
+		      this.position[columnsName[x]+y] = position[row][square];
+		      x++; // advance cursor x by 1
+		  }
+		  // if piece is not in position advance (x,y) cursor
+		  else {
+		      x += parseInt(position[row][square]);
+		  }
+	     }
+
+	     y--; // next row
+	 }
+	 
+    },
+
+
+    drawPieces: function() {
+
+	 for ( var k in this.position ) {
+	     $("#"+k).append("<div class='piece "+this.position[k]+"'></div>");
+	 }
+    },
+
+
+    
+    movePiece: function(start, end) {
+	 // game log
+	 this.position[end] = this.position[start];
+	 delete this.position[start];
+	 
+	 // actual board update
+
+	 // picks the piece
+	 var piece = $("#"+start).children().each(function() {
+	     var p = $(this);
+	     if ( p.hasClass("piece") )
+		  p.detach();
+	 });
+	 
+	 // drops the piece
+	 var end = $("#"+end);
+	 end.children().remove();
+	 end.append(piece);
+    },
+	 
+	 
+    rotateBoard: function() {
+	 this.orientation = this.orientation === "w" ? "b" : "w";
+
+	 $("#table").children().remove();
+
+	 this.loadBoard();
+
+	 this.drawPieces();
+
+    },
+}
