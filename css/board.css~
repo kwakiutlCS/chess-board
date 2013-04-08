@@ -21,16 +21,26 @@
 }
 
 .light {
-	background-color: white;
+	background-color: #f1d7b6;
 }
 
 .dark {
-	background-color: black;
+	background-color: rgb(148, 104, 70);
 }
 
 
+
+
 .selected {
-	background-color: green;
+	background-color: rgba(139, 207, 64, 0.81);  
+}
+
+.previousEnd {
+	background-color: rgba(139, 207, 250, 1);  
+}
+
+.previousStart {
+	background-color: rgba(139, 207, 250, 0.5);  
 }
 
 

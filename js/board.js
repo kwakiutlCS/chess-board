@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    game.startGame({ size: 400, player: "both", orientation: "black", turn: "white" });
+    game.startGame({ size: 400, player: "both", orientation: "white", turn: "white" });
         
 });
 
@@ -27,6 +27,7 @@ var game = {
 
     passant: "-",
 
+    
     startGame: function(params) {
 
 	 // allows default values 
@@ -82,8 +83,7 @@ var game = {
 	 $("#board").on("click", ".square", function() {
 	     var square = $(this);
 	     var selectedSquare = $(".square.selected");
-
-
+	     
 	     // if piece selected and movement possible, move it
 	     var end = square.attr("id");
 	     var start = selectedSquare.attr("id");
@@ -105,6 +105,7 @@ var game = {
 			   start = square.attr("id");
 			   
 			   game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(square.attr("id"), game.position),nextTurn);
+			   
 			   console.log(game.possibleMoves);
 		      }
 		  });
@@ -201,6 +202,9 @@ var game = {
     
     movePiece: function(start, end) {
 	 
+	 $(".previousEnd").removeClass("previousEnd");
+	 $(".previousStart").removeClass("previousStart");
+	 
 	 
 	 //en passant piece removal
 	 if (this.position[start].toLowerCase() === "p" && end === this.passant ) {
@@ -225,6 +229,48 @@ var game = {
 	 else 
 	     this.passant = "-";
 
+	 // register castling possibilities
+	 if ( this.castling !== "-" ) {
+	     if ( this.position[start] === "K" ) {
+		  this.castling = this.castling.replace("K","");
+		  this.castling = this.castling.replace("Q","");
+		  
+	     }
+	     else if ( this.position[start] === "k" ) {
+		  this.castling = this.castling.replace("k","");
+		  this.castling = this.castling.replace("q","");
+		  
+	     }
+	     else if ( start === "h1" )  this.castling = this.castling.replace("K","");
+	     else if ( start === "h8" )  this.castling = this.castling.replace("k","");
+	     else if ( start === "a1" )  this.castling = this.castling.replace("Q","");
+	     else if ( start === "a8" )  this.castling = this.castling.replace("q","");
+	 }
+
+	 // castling 
+	 if ( start === "e1" && this.position[start] === "K") {
+	     if ( end === "g1" ) {
+		  var rook = $("#h1").children().last().detach();
+		  $("#f1").append(rook);
+	     }
+	     else if ( end === "c1" ) {
+		  var rook = $("#a1").children().last().detach();
+		  $("#d1").append(rook);
+	     }
+	     
+	 } 
+	 else if ( start === "e8" && this.position[start] === "k") {
+	     if ( end === "g8" ) {
+		  var rook = $("#h8").children().last().detach();
+		  $("#f8").append(rook);
+	     }
+	     else if ( end === "c8" ) {
+		  var rook = $("#a8").children().last().detach();
+		  $("#d8").append(rook);
+	     }
+	     
+	 } 
+
 
 	 // game position
 	 this.position = this.generateNewPosition(start, end, passant);
@@ -233,7 +279,8 @@ var game = {
 	 // actual board update
 
 	 // normal pick the piece
-	 var piece = $("#"+start).children().each(function() {
+	 var start = $("#"+start);
+	 var piece = start.children().each(function() {
 	     var p = $(this);
 	     if ( p.hasClass("piece") )
 		  p.detach();
@@ -244,14 +291,18 @@ var game = {
 	 end.children().remove();
 	 end.append(piece);
 
-	 // TODO 
-	 // castling 
+	 
  
 	 // update turn
 	 this.turn = this.turn === "white" ? "black" : "white";
 
 	 // TODO
 	 // update log
+
+	 // register the move on the board
+	 end.addClass("previousEnd");
+	 start.addClass("previousStart");
+	 
     },
 	 
 
@@ -665,6 +716,23 @@ var game = {
 		  if ( !( columnsName[x]+y in pos ) || this.isEnemyPresent(square, columnsName[x]+y, pos) )
 		      possibleMoves.push(columnsName[x]+y);
 	     }
+
+	     // castling moves
+	     // white king
+	     if ( pos[square] === "K" ) {
+		  if  ( this.castling.indexOf("K") !== -1 && !this.areSquaresAttacked(["e1","f1","g1"],"black") && !("f1" in pos) && !("g1" in pos) )
+		      possibleMoves.push("g1");
+		  if ( this.castling.indexOf("Q") !== -1 && !this.areSquaresAttacked(["e1","d1","c1"],"black") && !("c1" in pos) && !("d1" in pos) && !("b1" in pos) )
+		      possibleMoves.push("c1");
+	     }
+	     else if ( pos[square] === "k" ) {
+		  if  ( this.castling.indexOf("k") !== -1  && !this.areSquaresAttacked(["e8","f8","g8"],"white") && !("f8" in pos) && !("g8" in pos) )
+		      possibleMoves.push("g8");
+		  if ( this.castling.indexOf("q") !== -1 && !this.areSquaresAttacked(["e8","d8","c8"],"white") && !("c8" in pos) && !("d8" in pos) && !("b8" in pos) )
+		      possibleMoves.push("c8");
+	     }
+	     
+	     
 	 }
 
 
@@ -764,7 +832,22 @@ var game = {
 	 }
 
 	 // deals with castling
-	 // TODO
+	 if ( start === "e1" && end === "g1" && pos[end] === "K" ) {
+	     pos["f1"] = "R";
+	     delete pos["h1"];
+	 }
+	 else if ( start === "e1" && end === "c1" && pos[end] === "K" ) {
+	     pos["d1"] = "R";
+	     delete pos["a1"];
+	 }
+	 else if ( start === "e8" && end === "g8" && pos[end] === "k" ) {
+	     pos["f8"] = "r";
+	     delete pos["h8"];
+	 }
+	 else if ( start === "e8" && end === "c8" && pos[end] === "k" ) {
+	     pos["d8"] = "r";
+	     delete pos["a8"];
+	 }
 	 
 	 return pos;
     },
@@ -823,6 +906,27 @@ var game = {
     },
 
     
+    // helper function to know if castling is possible
+    areSquaresAttacked: function(squares, color) {
+
+	 var moves;
+
+	 for ( var k in this.position ) {
+	     if ( this.position[k] === this.position[k].toLowerCase() && color === "black" ) {
+		  moves = this.getPossibleMoves(k, this.position);
+		   
+		  for ( var sq in squares ) {
+		      if ( moves.indexOf(squares[sq]) !== -1 )
+			   return true;
+		  }
+	     }
+		  
+	 }
+
+	 return false;
+    },
+
+
     // checks if enemy pieces are present at given squares 
     isEnemyPresent: function(s1, s2, pos) {
 	 

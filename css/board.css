@@ -29,8 +29,18 @@
 }
 
 
+
+
 .selected {
 	background-color: rgba(139, 207, 64, 0.81);  
+}
+
+.previousEnd {
+	background-color: rgba(139, 207, 250, 1);  
+}
+
+.previousStart {
+	background-color: rgba(139, 207, 250, 0.5);  
 }
 
 
