@@ -791,7 +791,7 @@ var game = {
 
 	     // castling moves
 	     // white king
-	     if ( pos[square] === "K" ) {
+	     /*if ( pos[square] === "K" ) {
 		  if  ( this.castling.indexOf("K") !== -1 && !this.areSquaresAttacked(["e1","f1","g1"],"black") && !("f1" in pos) && !("g1" in pos) )
 		      possibleMoves.push("g1");
 		  if ( this.castling.indexOf("Q") !== -1 && !this.areSquaresAttacked(["e1","d1","c1"],"black") && !("c1" in pos) && !("d1" in pos) && !("b1" in pos) )
@@ -802,7 +802,7 @@ var game = {
 		      possibleMoves.push("g8");
 		  if ( this.castling.indexOf("q") !== -1 && !this.areSquaresAttacked(["e8","d8","c8"],"white") && !("c8" in pos) && !("d8" in pos) && !("b8" in pos) )
 		      possibleMoves.push("c8");
-	     }
+	     }*/
 	     
 	     
 	 }
@@ -963,39 +963,293 @@ var game = {
 
     // remove illegal moves from possible moves
     filterIllegalMoves: function(start,moves,turn) {
+	var possible = [];
 
-	 var filteredMoves = [];
-	 var newPos;
+	for ( var m in moves ) {
+	    // register king square
+	    if ( this.position[start] === "K" || this.position[start] === "k" ) {
+		var kingSquare = moves[m];
+	    }
+	    else {
+		//if king to watch is white
+		if ( turn === "black" ) {
+		    for ( var k in this.position ) {
+			if ( this.position[k] === "K" ) {
+			    var kingSquare = k;
+			    break;
+			}
+		    }
+		}
+		//if king to watch is black
+		else {
+		    for ( var k in this.position ) {
+			if ( this.position[k] === "k" ) {
+			    var kingSquare = k;
+			    break;
+			}
+		    }
+		}
+		
+	    }
+	    
+	    // if king is attacked
+	    var pos = this.generateNewPosition(start,moves[m],this.passant);
+	    if ( !this.areSquaresAttacked([kingSquare],turn,pos) )
+		possible.push(moves[m]);
+	}
 
-	 
-	 for ( var i in moves ) {
-	     newPos = this.generateNewPosition(start,moves[i]);
-	     if ( this.isPositionLegal(newPos,turn) )
-		  filteredMoves.push(moves[i]);
-	 }
-
-	 return filteredMoves;
+	return possible;
     },
 
     
-    // helper function to know if castling is possible
-    areSquaresAttacked: function(squares, color) {
+    // helper function to know if move is illegal
+    areSquaresAttacked: function(squares, color,pos) {
+	
+	var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
-	 var moves;
+	for ( var sq in squares ) {
+	    
+	    var sqArray = squares[sq].split("");
 
-	 for ( var k in this.position ) {
-	     if ( this.position[k] === this.position[k].toLowerCase() && color === "black" ) {
-		  moves = this.getPossibleMoves(k, this.position);
-		   
-		  for ( var sq in squares ) {
-		      if ( moves.indexOf(squares[sq]) !== -1 )
-			   return true;
-		  }
-	     }
-		  
-	 }
+	    // North attack
+	    var x = sqArray[0];
+	    var y = parseInt(sqArray[1]);
+	    while ( y < 8 ) {
+		
+		y++;
+		
+		var newSq = [x,y].join("");
+		// piece on the position
+		if ( newSq in pos ) {
+		    // friendly piece
+		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+			break;
+		    }
 
-	 return false;
+		    // enemy piece
+		    else {
+			if ( pos[newSq].toUpperCase() === "R" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && y-parseInt(sqArray[1]) === 1 ) ) {
+			    return true;
+			}
+			break;
+		    }
+		}
+	    }
+
+	    // South attack
+	    var x = sqArray[0];
+	    var y = parseInt(sqArray[1]);
+	    while ( y > 1 ) {
+		
+		y--;
+
+		var newSq = [x,y].join("");
+		// piece on the position
+		if ( newSq in pos ) {
+		    // friendly piece
+		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+			break;
+		    }
+
+		    // enemy piece
+		    else {
+			if ( pos[newSq].toUpperCase() === "R" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && y-parseInt(sqArray[1]) === -1 ) ) {
+			    return true;
+			}
+			break;
+		    }
+		}
+	    }
+
+	    // East attack
+	    var x = sqArray[0].charCodeAt(0)-97;
+	    var y = sqArray[1];
+	    while ( x < 7 ) {
+		
+		x++;
+
+		var newSq = [columnsName[x],y].join("");
+		// piece on the position
+		if ( newSq in pos ) {
+		    // friendly piece
+		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+			break;
+		    }
+
+		    // enemy piece
+		    else {
+			if ( pos[newSq].toUpperCase() === "R" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) ) {
+			    return true;
+			}
+			break;
+		    }
+		}
+	    }
+			    
+
+	    // West attack
+	    var x = sqArray[0].charCodeAt(0)-97;
+	    var y = sqArray[1];
+
+	    while ( x > 0 ) {
+		
+		x--;
+
+		var newSq = [columnsName[x],y].join("");
+		// piece on the position
+		if ( newSq in pos ) {
+		    // friendly piece
+		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+			break;
+		    }
+
+		    // enemy piece
+		    else {
+			if ( pos[newSq].toUpperCase() === "R" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && x-(sqArray[0].charCodeAt(0)-97) === -1 ) ) {
+			    return true;
+			}
+			break;
+		    }
+		}
+	    }
+
+	    // NorthEast attack
+	    var x = sqArray[0].charCodeAt(0)-97;
+	    var y = parseInt(sqArray[1]);
+
+	    while ( x < 7 && y < 8) {
+		
+		x++;
+		y++;
+
+		var newSq = [columnsName[x],y].join("");
+		// piece on the position
+		if ( newSq in pos ) {
+		    // friendly piece
+		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+			break;
+		    }
+
+		    // enemy piece
+		    else {
+			if ( pos[newSq].toUpperCase() === "B" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) || ( pos[newSq] === "p" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) ) {
+			    return true;
+			}
+			break;
+		    }
+		}
+	    }
+
+	    // NorthWest attack
+	    var x = sqArray[0].charCodeAt(0)-97;
+	    var y = parseInt(sqArray[1]);
+
+	    while ( x > 0 && y < 8) {
+		
+		x--;
+		y++;
+
+		var newSq = [columnsName[x],y].join("");
+		// piece on the position
+		if ( newSq in pos ) {
+		    // friendly piece
+		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+			break;
+		    }
+
+		    // enemy piece
+		    else {
+			if ( pos[newSq].toUpperCase() === "B" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && x-(sqArray[0].charCodeAt(0)-97) === -1 ) || ( pos[newSq] === "p" && x-(sqArray[0].charCodeAt(0)-97) === -1 ) ) {
+			    return true;
+			}
+			break;
+		    }
+		}
+	    }
+
+	    // SouthWest attack
+	    var x = sqArray[0].charCodeAt(0)-97;
+	    var y = parseInt(sqArray[1]);
+
+	    while ( x > 0 && y > 1) {
+		
+		x--;
+		y--;
+
+		var newSq = [columnsName[x],y].join("");
+		// piece on the position
+		if ( newSq in pos ) {
+		    // friendly piece
+		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+			break;
+		    }
+
+		    // enemy piece
+		    else {
+			if ( pos[newSq].toUpperCase() === "B" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && x-(sqArray[0].charCodeAt(0)-97) === -1 ) || ( pos[newSq] === "P" && x-(sqArray[0].charCodeAt(0)-97) === -1 ) ) {
+			    return true;
+			}
+			break;
+		    }
+		}
+	    }
+	
+	    // SouthEast attack
+	    var x = sqArray[0].charCodeAt(0)-97;
+	    var y = parseInt(sqArray[1]);
+
+	    while ( x < 7 && y > 1) {
+		
+		x++;
+		y--;
+
+		var newSq = [columnsName[x],y].join("");
+		// piece on the position
+		if ( newSq in pos ) {
+		    // friendly piece
+		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+			break;
+		    }
+
+		    // enemy piece
+		    else {
+			if ( pos[newSq].toUpperCase() === "B" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) || ( pos[newSq] === "P" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) ) {
+			    return true;
+			}
+			break;
+		    }
+		}
+	    }
+
+	    
+	    // Knight attacks
+	    var x = sqArray[0].charCodeAt(0)-97;
+	    var y = parseInt(sqArray[1]);
+
+	    // white knight
+	    if ( color === "white" ) {
+		for ( var k in pos ) {
+		    if ( pos[k] === "N" ) {
+			if ( [columnsName[x+1],y+2].join("") === k || [columnsName[x-1],y+2].join("") === k || [columnsName[x+2],y+1].join("") === k || [columnsName[x-2],y+1].join("") === k || [columnsName[x+2],y-1].join("") === k || [columnsName[x-2],y-1].join("") === k || [columnsName[x-1],y-2].join("") === k || [columnsName[x-1],y+2].join("") === k )
+			    return true;
+
+		    }
+		}
+	    }
+	    // black knight
+	    else  {
+		for ( var k in pos ) {
+		    if ( pos[k] === "n" ) {
+			if ( [columnsName[x+1],y+2].join("") === k || [columnsName[x-1],y+2].join("") === k || [columnsName[x+2],y+1].join("") === k || [columnsName[x-2],y+1].join("") === k || [columnsName[x+2],y-1].join("") === k || [columnsName[x-2],y-1].join("") === k || [columnsName[x-1],y-2].join("") === k || [columnsName[x-1],y+2].join("") === k )
+			    return true;
+
+		    }
+		}
+	    }
+	}
+	
+	
+	return false;
     },
 
 
