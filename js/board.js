@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    game.startGame({ size: 400, player: "both", orientation: "white", turn: "white", fen:"KQ6/8/8/8/8/8/8/6qk w - - 0 1" });
+    game.startGame({ size: 400, player: "both", orientation: "white", turn: "white" });
         
 });
 
@@ -92,11 +92,12 @@ var game = {
  
 	 // allow square selection and piece movement
 	 $("#board").on("click", ".square", this.addBoardEvents);
+	 	 
 	 
     },
 
     preparePromotion: function() {
-	 $("#table").append("<div id='promotionTable'><div>Promotion</div></div>");
+	 $("#table").append("<div id='promotionTable' class='text'><div>Promotion</div></div>");
 	 $("#promotionTable").append("<div class='colorPromotionTable' id='whitePromotionTable'></div>");
 	 $("#promotionTable").append("<div class='colorPromotionTable' id='blackPromotionTable'></div>");
 
@@ -135,6 +136,13 @@ var game = {
 	     }
 	     
 	     $("#board").on("click", ".square", game.addBoardEvents);
+	     // activate deactivate dragging
+	     if ( this.turn === "white" ) {
+		  $(".piece.white").draggable("enable");
+	     }
+	     else {
+		  $(".piece.black").draggable("enable");
+	     }
 	     $("#promotionTable, #whitePromotionTable, #blackPromotionTable").hide();
 	 });
     },
@@ -262,11 +270,72 @@ var game = {
 		  $("#"+k).append("<div class='piece black "+this.position[k]+"' data-color='black' data-piece='"+this.position[k]+"'></div>");
 	     
 	 }
+
+	 $(".piece").draggable( { containment: "#board", revert: true, zIndex: 5, revertDuration: 0, distance: 10 } );
+
+	 $("#board").on("dragstart", ".piece", function() {
+	     var square = $(this).parent();
+	     
+	     // updates "possibleMoves" for selected piece
+	     var nextTurn = game.turn === "white" ? "black" : "white";
+	     var start = square.attr("id");
+	     
+	     game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(start, game.position),nextTurn);
+	     
+	     $(".selected").removeClass("selected");
+	     console.log(game.possibleMoves);
+	 });
+
+	 $("#board").on("dragstop", ".square", function(evt, ui) {
+	     
+	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
+
+	     var start = $(this).attr("id").split("");
+	     start[0] = start[0].charCodeAt(0)-97;
+	     start[1] = parseInt(start[1]);
+
+	     var end = game.getSquare(ui.position, start);
+	     
+	     start = columnsName[start[0]]+start[1];
+	     end = columnsName[end[0]]+end[1];
+	    
+	     for ( var i in game.possibleMoves ) {
+		  if ( game.possibleMoves[i] === end ) {
+		      game.movePiece(start, end);
+		      break;
+		  }
+	     }
+	 });
+
+	 if ( this.turn === "white" ) 
+	     $(".piece.black").draggable("disable");
+	 else
+	     $(".piece.white").draggable("disable");
     },
 
 
+    getSquare: function(pos,  start) {
+	 
+	 var squareSize = this.size/8;
+	 
+	 var dx = parseInt(pos.left/squareSize) + (pos.left%squareSize > squareSize/2 ? 1 : ( pos.left%squareSize < -squareSize/2 ? -1 : 0 ));
+	 var dy = -(parseInt(pos.top/squareSize) + (pos.top%squareSize > squareSize/2 ? 1 : ( pos.top%squareSize < -squareSize/2 ? -1 :0 ))); 
+
+	 if ( this.orientation === "black" ) {
+	     dx *= -1;
+	     dy *= -1;
+	 }
+
+	 var x = dx + start[0];
+	 var y = dy + start[1];
+
+	 return [x,y];
+	 
+    },
+    
     
     movePiece: function(start, end) {
+	 
 	 
 	 $(".previousEnd").removeClass("previousEnd");
 	 $(".previousStart").removeClass("previousStart");
@@ -373,10 +442,21 @@ var game = {
 	 endSquare.addClass("previousEnd");
 	 start.addClass("previousStart");
 	 
+	 
+	 // activate deactivate dragging
+	 if ( this.turn === "white" ) {
+	     $(".piece.black").draggable("disable");
+	     $(".piece.white").draggable("enable");
+	 }
+	 else {
+	     $(".piece.white").draggable("disable");
+	     $(".piece.black").draggable("enable");
+	 }
 
 	 // deals with promotions
 	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
 	     $("#board").off("click", ".square");
+	     $(".piece").draggable("disable");
 	     $("#promotionTable").show();
 	     
 	     if ( end[1] === "1" ) {
@@ -389,9 +469,11 @@ var game = {
 	 
 	 // update result
 	 this.result = this.getResult();
-	 if ( this.result !== "active" )
+	 if ( this.result !== "active" ) {
 	     $("#board").off("click", ".square");
+	 }
 
+	 
     },
 	 
 
