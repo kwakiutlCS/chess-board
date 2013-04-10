@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    game.startGame({ size: 400, player: "both", orientation: "white", turn: "white" });
+    game.startGame({ size: 600, player: "both", orientation: "white", turn: "white", label: true });
         
 });
 
@@ -31,6 +31,8 @@ var game = {
 
     lastMoves: [],
 
+    label: false,
+
     startGame: function(params) {
 
 	 // allows default values 
@@ -49,6 +51,8 @@ var game = {
 	 if ( "turn" in params )
 	     this.turn = params["turn"];
 
+	 if ( "label" in params )
+	     this.label = params["label"];
 
 	 // gets board and piece position in log
 	 this.getInitialPosition();
@@ -59,6 +63,8 @@ var game = {
 
 	 this.preparePromotion();
 	 
+	 if (this.label)
+	     this.addLabel();
 
 	 // allow board rotation
 	 $(document).on("keypress", function() {
@@ -148,6 +154,28 @@ var game = {
     },
     
 
+    addLabel: function() {
+	 
+	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
+
+	 $("#table").append("<div id='verticalLabel'><div>");
+	 $("#table").append("<div id='horizontalLabel'><div>");
+	     
+	 if ( this.orientation === "white" ) {
+	     for ( var i = 8; i > 0; i--) 
+		  $("#verticalLabel").append("<div class='text verticalLabelSquare'>"+i+"</div>");
+	     for ( var i = 0; i < 8; i++) 
+		  $("#horizontalLabel").append("<div class='text horizontalLabelSquare'>"+columnsName[i]+"</div>");
+	 }
+	 else {
+	     for ( var i = 1; i < 9; i++) 
+		  $("#verticalLabel").append("<div class='text verticalLabelSquare'>"+i+"</div>");
+	     for ( var i = 7; i >= 0; i--) 
+		  $("#horizontalLabel").append("<div class='text horizontalLabelSquare'>"+columnsName[i]+"</div>");
+	 }
+    },
+
+
     addBoardEvents: function() {
 	 var square = $(this);
 	 var selectedSquare = $(".square.selected");
@@ -226,6 +254,7 @@ var game = {
 	 this.passant = fenArray[3];
 	 
 	 this.turn = fenArray[1] === "w" ? "white" : "black";
+	 
 
 	 // TODO
 	 //moves info
@@ -471,6 +500,7 @@ var game = {
 	 this.result = this.getResult();
 	 if ( this.result !== "active" ) {
 	     $("#board").off("click", ".square");
+	     $(".piece").draggable("disable");
 	 }
 
 	 
@@ -558,6 +588,8 @@ var game = {
 
 	 this.drawPieces();
 
+	 if (this.label)
+	     this.addLabel();
     },
 
 
