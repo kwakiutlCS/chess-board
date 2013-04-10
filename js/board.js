@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    game.startGame({ size: 400, player: "both", orientation: "white", turn: "white" });
+    game.startGame({ size: 400, player: "both", orientation: "white", turn: "white", fen:"KQ6/8/8/8/8/8/8/6qk w - - 0 1" });
         
 });
 
@@ -28,6 +28,8 @@ var game = {
     passant: "-",
 
     promotionPending: false,
+
+    lastMoves: [],
 
     startGame: function(params) {
 
@@ -82,10 +84,14 @@ var game = {
 	 // draw squares
 	 this.drawSquares(this.size/8);
 
+	 // last moves marked on the board
+	 if ( this.lastMoves.length === 2 ) {
+	     $("#"+this.lastMoves[1]).addClass("previousEnd");
+	     $("#"+this.lastMoves[0]).addClass("previousStart");
+	 }
+ 
 	 // allow square selection and piece movement
 	 $("#board").on("click", ".square", this.addBoardEvents);
-
-	 
 	 
     },
 
@@ -158,7 +164,7 @@ var game = {
 		      var nextTurn = game.turn === "white" ? "black" : "white";
 		      start = square.attr("id");
 		      
-		      game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(square.attr("id"), game.position),nextTurn);
+		      game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(start, game.position),nextTurn);
 		      
 		      console.log(game.possibleMoves);
 		  }
@@ -206,6 +212,15 @@ var game = {
 	 var fenArray = this.fen.split(" ");
 
 	 var position = fenArray[0].split("/");
+
+	 this.castling = fenArray[2];
+	 
+	 this.passant = fenArray[3];
+	 
+	 this.turn = fenArray[1] === "w" ? "white" : "black";
+
+	 // TODO
+	 //moves info
 
 	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
@@ -256,6 +271,7 @@ var game = {
 	 $(".previousEnd").removeClass("previousEnd");
 	 $(".previousStart").removeClass("previousStart");
 	 
+	 this.lastMoves = [start,end];
 
 	 // board update
 	 
@@ -368,13 +384,85 @@ var game = {
 	     }
 	     else
 		  $("#whitePromotionTable").show();
-
-	     
 	 }
+
 	 
+	 // update result
+	 this.result = this.getResult();
+	 if ( this.result !== "active" )
+	     $("#board").off("click", ".square");
+
     },
 	 
 
+
+    getResult: function() {
+	 
+	 if ( this.turn === "black" ) {
+	     
+	     // black king square
+	     var kingSquare;
+	     for ( var k in this.position ) {
+		  if ( this.position[k] === "k" )
+		      kingSquare = k;
+	     }
+	     
+	     //check if there is a saving move
+	     var moves;
+
+	     for ( var k in this.position ) {
+
+		  // get all the black pieces
+		  if ( this.position[k].toLowerCase() === this.position[k] ) {
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "white");
+		      if ( moves.length !== 0 )
+			   return "active";
+		  }
+	     }
+	     
+	     // if black king is attacked
+	     if ( this.areSquaresAttacked([kingSquare],"white",this.position) ) {
+		  return "white";
+	     }
+	     // if king is not attacked
+	     else {
+		  return "draw";
+	     }
+	 }
+
+	 else {
+	     
+	     // white king square
+	     var kingSquare;
+	     for ( var k in this.position ) {
+		  if ( this.position[k] === "K" )
+		      kingSquare = k;
+	     }
+	     
+	     
+	     //check if there is a saving move
+	     var moves;
+
+	     for ( var k in this.position ) {
+		  // get all the white pieces
+		  if ( this.position[k].toUpperCase() === this.position[k] ) {
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "black");
+		      if ( moves.length !== 0 )
+			   return "active";
+		  }
+	     }
+	     
+	     
+	     // if black king is attacked
+	     if ( this.areSquaresAttacked([kingSquare],"black",this.position) ) {
+		  return "black";
+	     }
+	     // if king is not attacked
+	     else {
+		  return "draw";
+	     }
+	 }
+    },
 
 
 
@@ -791,18 +879,20 @@ var game = {
 
 	     // castling moves
 	     // white king
-	     /*if ( pos[square] === "K" ) {
-		  if  ( this.castling.indexOf("K") !== -1 && !this.areSquaresAttacked(["e1","f1","g1"],"black") && !("f1" in pos) && !("g1" in pos) )
+	     if ( pos[square] === "K" ) {
+		  if  ( this.castling.indexOf("K") !== -1 && !("f1" in pos) && !("g1" in pos) && !this.areSquaresAttacked(["e1","f1","g1"],"black", pos) )
 		      possibleMoves.push("g1");
-		  if ( this.castling.indexOf("Q") !== -1 && !this.areSquaresAttacked(["e1","d1","c1"],"black") && !("c1" in pos) && !("d1" in pos) && !("b1" in pos) )
+		  
+		  if ( this.castling.indexOf("Q") !== -1 && !("c1" in pos) && !("d1" in pos) && !("b1" in pos) && !this.areSquaresAttacked(["e1","d1","c1"],"black", pos) ) {
 		      possibleMoves.push("c1");
+		  }
 	     }
 	     else if ( pos[square] === "k" ) {
-		  if  ( this.castling.indexOf("k") !== -1  && !this.areSquaresAttacked(["e8","f8","g8"],"white") && !("f8" in pos) && !("g8" in pos) )
+		  if  ( this.castling.indexOf("k") !== -1 && !("f8" in pos) && !("g8" in pos)  && !this.areSquaresAttacked(["e8","f8","g8"],"white", pos) )
 		      possibleMoves.push("g8");
-		  if ( this.castling.indexOf("q") !== -1 && !this.areSquaresAttacked(["e8","d8","c8"],"white") && !("c8" in pos) && !("d8" in pos) && !("b8" in pos) )
+		  if ( this.castling.indexOf("q") !== -1 && !("c8" in pos) && !("d8" in pos) && !("b8" in pos) && !this.areSquaresAttacked(["e8","d8","c8"],"white", pos) )
 		      possibleMoves.push("c8");
-	     }*/
+	     }
 	     
 	     
 	 }
@@ -925,44 +1015,11 @@ var game = {
     },
 
 
-    // checks if position is legal - if white is to move and black king is already in check or vice versa
-    isPositionLegal: function(position,turn) {
-	 
-	 // gets king position
-	 var kingPosition;
-	 for ( var k in position ) {
-	     if ( (turn === "black" && position[k] === "K") || (turn === "white" && position[k] === "k") ) {
-		  kingPosition = k;
-		  break;
-	     }
-	 }
-	 
-	 
-	 for ( var k in position ) {
-	 
-	     var moves = [];
-
-	     // select pieces only from current color
-	     if ( turn === "white" && position[k] === position[k].toUpperCase() ) {
-		  moves = this.getPossibleMoves(k, position);
-	     }
-	     else if ( turn === "black" && position[k] === position[k].toLowerCase() ) {
-		  moves = this.getPossibleMoves(k, position);
-	     }
-
-	     // if king is attacked
-	     if ( moves.indexOf(kingPosition) !== -1 )
-		  return false;
-	 }
-
-	 // king not attacked
-	 return true;
-
-    },
-    
+        
 
     // remove illegal moves from possible moves
     filterIllegalMoves: function(start,moves,turn) {
+	 	 
 	var possible = [];
 
 	for ( var m in moves ) {
@@ -991,7 +1048,7 @@ var game = {
 		}
 		
 	    }
-	    
+	 
 	    // if king is attacked
 	    var pos = this.generateNewPosition(start,moves[m],this.passant);
 	    if ( !this.areSquaresAttacked([kingSquare],turn,pos) )
@@ -1022,7 +1079,7 @@ var game = {
 		// piece on the position
 		if ( newSq in pos ) {
 		    // friendly piece
-		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+		    if ( ( pos[newSq] === pos[newSq].toUpperCase() && color === "black" ) || ( pos[newSq] === pos[newSq].toLowerCase() && color === "white" ) ) {
 			break;
 		    }
 
@@ -1047,7 +1104,7 @@ var game = {
 		// piece on the position
 		if ( newSq in pos ) {
 		    // friendly piece
-		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+		    if ( ( pos[newSq] === pos[newSq].toUpperCase() && color === "black" ) || ( pos[newSq] === pos[newSq].toLowerCase() && color === "white" ) ) {
 			break;
 		    }
 
@@ -1072,7 +1129,7 @@ var game = {
 		// piece on the position
 		if ( newSq in pos ) {
 		    // friendly piece
-		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+		    if ( ( pos[newSq] === pos[newSq].toUpperCase() && color === "black" ) || ( pos[newSq] === pos[newSq].toLowerCase() && color === "white" ) ) {
 			break;
 		    }
 
@@ -1099,7 +1156,7 @@ var game = {
 		// piece on the position
 		if ( newSq in pos ) {
 		    // friendly piece
-		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+		    if ( ( pos[newSq] === pos[newSq].toUpperCase() && color === "black" ) || ( pos[newSq] === pos[newSq].toLowerCase() && color === "white" ) ) {
 			break;
 		    }
 
@@ -1123,16 +1180,18 @@ var game = {
 		y++;
 
 		var newSq = [columnsName[x],y].join("");
+		 
 		// piece on the position
 		if ( newSq in pos ) {
+		    
 		    // friendly piece
-		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
-			break;
+		    if ( ( pos[newSq] === pos[newSq].toUpperCase() && color === "black" ) || ( pos[newSq] === pos[newSq].toLowerCase() && color === "white" ) ) {
+			 break;
 		    }
 
 		    // enemy piece
 		    else {
-			if ( pos[newSq].toUpperCase() === "B" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) || ( pos[newSq] === "p" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) ) {
+			 if ( pos[newSq].toUpperCase() === "B" || pos[newSq].toUpperCase() === "Q" || ( pos[newSq].toUpperCase() === "K" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) || ( pos[newSq] === "p" && x-(sqArray[0].charCodeAt(0)-97) === 1 ) ) {
 			    return true;
 			}
 			break;
@@ -1153,7 +1212,7 @@ var game = {
 		// piece on the position
 		if ( newSq in pos ) {
 		    // friendly piece
-		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+		    if ( ( pos[newSq] === pos[newSq].toUpperCase() && color === "black" ) || ( pos[newSq] === pos[newSq].toLowerCase() && color === "white" ) ) {
 			break;
 		    }
 
@@ -1180,7 +1239,7 @@ var game = {
 		// piece on the position
 		if ( newSq in pos ) {
 		    // friendly piece
-		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+		    if ( ( pos[newSq] === pos[newSq].toUpperCase() && color === "black" ) || ( pos[newSq] === pos[newSq].toLowerCase() && color === "white" ) ) {
 			break;
 		    }
 
@@ -1207,7 +1266,7 @@ var game = {
 		// piece on the position
 		if ( newSq in pos ) {
 		    // friendly piece
-		    if ( !(this.isEnemyPresent(squares[sq], newSq, pos) ) ) {
+		    if ( ( pos[newSq] === pos[newSq].toUpperCase() && color === "black" ) || ( pos[newSq] === pos[newSq].toLowerCase() && color === "white" ) ) {
 			break;
 		    }
 
