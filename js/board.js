@@ -1,5 +1,6 @@
 $(document).ready(function() {
-    game.startGame({ size: 600, player: "both", orientation: "white", turn: "white", label: true });
+    
+    game.startGame({ size: 500, player: "both", orientation: "white", label: false });
         
 });
 
@@ -36,7 +37,7 @@ var game = {
     startGame: function(params) {
 
 	 // allows default values 
-	 if ( "fen" in params )
+	 if ( "fen" in params && params["fen"])
 	     this.fen = params["fen"];
 
 	 if ( "size" in params )
@@ -48,9 +49,6 @@ var game = {
 	 if ( "orientation" in params )
 	     this.orientation = params["orientation"];
 
-	 if ( "turn" in params )
-	     this.turn = params["turn"];
-
 	 if ( "label" in params )
 	     this.label = params["label"];
 
@@ -61,11 +59,10 @@ var game = {
 
 	 this.loadBoard();
 
+	 this.addLabel();
+	 
 	 this.preparePromotion();
 	 
-	 if (this.label)
-	     this.addLabel();
-
 	 // allow board rotation
 	 $(document).on("keypress", function() {
 	     game.rotateBoard();
@@ -150,6 +147,17 @@ var game = {
 		  $(".piece.black").draggable("enable");
 	     }
 	     $("#promotionTable, #whitePromotionTable, #blackPromotionTable").hide();
+	     $(document).on("keypress", function() {
+		  game.rotateBoard();
+	     });
+
+	     // update result
+	     game.result = game.getResult();
+	     if ( game.result !== "active" ) {
+		  $("#board").off("click", ".square");
+		  $(".piece").draggable("disable");
+	     }
+	     
 	 });
     },
     
@@ -173,6 +181,9 @@ var game = {
 	     for ( var i = 7; i >= 0; i--) 
 		  $("#horizontalLabel").append("<div class='text horizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
+
+	 if (!this.label) 
+	     $("#verticalLabel, #horizontalLabel").addClass("hidden");
     },
 
 
@@ -231,13 +242,15 @@ var game = {
 		  $(".square").last().css( { left:j*squareSize, top: (8-i)*squareSize } );
 
 		  // choose square color
-		  if ( (i+j)%2 ) 
-		      $(".square").last().addClass("dark");
-		  else
-		      $(".square").last().addClass("light");
 
+		  if ( (i+j)%2 ) 
+		      $(".square").last().addClass("darkBrown");
+		  else
+		      $(".square").last().addClass("lightBrown");
 	     }
-	 }  
+		  
+	 }
+	   
 
    
     }, 
@@ -493,6 +506,7 @@ var game = {
 	     }
 	     else
 		  $("#whitePromotionTable").show();
+	     $(document).off("keypress");
 	 }
 
 	 
@@ -585,11 +599,13 @@ var game = {
 	 $("#table").children().remove();
 
 	 this.loadBoard();
+	 
+	 this.addLabel();
 
+	 this.preparePromotion();
+	 
 	 this.drawPieces();
 
-	 if (this.label)
-	     this.addLabel();
     },
 
 
@@ -1401,9 +1417,9 @@ var game = {
 
 	    // white knight
 	    if ( color === "white" ) {
-		for ( var k in pos ) {
+		 for ( var k in pos ) {
 		    if ( pos[k] === "N" ) {
-			if ( [columnsName[x+1],y+2].join("") === k || [columnsName[x-1],y+2].join("") === k || [columnsName[x+2],y+1].join("") === k || [columnsName[x-2],y+1].join("") === k || [columnsName[x+2],y-1].join("") === k || [columnsName[x-2],y-1].join("") === k || [columnsName[x-1],y-2].join("") === k || [columnsName[x-1],y+2].join("") === k )
+			if ( [columnsName[x+1],y+2].join("") === k || [columnsName[x-1],y+2].join("") === k || [columnsName[x+2],y+1].join("") === k || [columnsName[x-2],y+1].join("") === k || [columnsName[x+2],y-1].join("") === k || [columnsName[x-2],y-1].join("") === k || [columnsName[x-1],y-2].join("") === k || [columnsName[x+1],y-2].join("") === k )
 			    return true;
 
 		    }
@@ -1413,7 +1429,7 @@ var game = {
 	    else  {
 		for ( var k in pos ) {
 		    if ( pos[k] === "n" ) {
-			if ( [columnsName[x+1],y+2].join("") === k || [columnsName[x-1],y+2].join("") === k || [columnsName[x+2],y+1].join("") === k || [columnsName[x-2],y+1].join("") === k || [columnsName[x+2],y-1].join("") === k || [columnsName[x-2],y-1].join("") === k || [columnsName[x-1],y-2].join("") === k || [columnsName[x-1],y+2].join("") === k )
+			if ( [columnsName[x+1],y+2].join("") === k || [columnsName[x-1],y+2].join("") === k || [columnsName[x+2],y+1].join("") === k || [columnsName[x-2],y+1].join("") === k || [columnsName[x+2],y-1].join("") === k || [columnsName[x-2],y-1].join("") === k || [columnsName[x-1],y-2].join("") === k || [columnsName[x+1],y-2].join("") === k )
 			    return true;
 
 		    }

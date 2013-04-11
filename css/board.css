@@ -21,12 +21,20 @@
 	height: 12.5%;
 }
 
-.light {
+.lightBrown {
 	background-color: #f1d7b6;
 }
 
-.dark {
+.darkBrown {
 	background-color: rgb(148, 104, 70);
+}
+
+.lightGreen {
+	background-color: #ffffff;
+}
+
+.darkGreen {
+	background-color: rgb(84, 153, 84);
 }
 
 
@@ -101,7 +109,7 @@
     height: 80px;
     position: relative;
     border: 1px solid black;
-    margin: -70% auto auto auto;
+    margin: -170% auto auto auto;
     background-color: white;
     text-align: center;
     padding: 10px;
@@ -124,6 +132,7 @@
 
 
 .text {
+    font-family: arial;
     -webkit-touch-callout: none;
     -webkit-user-select: none;  
     -khtml-user-select: none;
@@ -178,4 +187,9 @@
     text-align: center;
     display: inline-block;
     
+}
+
+
+.hidden {
+    visibility: hidden;
 }
