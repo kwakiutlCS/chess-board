@@ -140,7 +140,7 @@ var game = {
 	     
 	     $("#board").on("click", ".square", game.addBoardEvents);
 	     // activate deactivate dragging
-	     if ( this.turn === "white" ) {
+	     if ( game.turn === "white" ) {
 		  $(".piece.white").draggable("enable");
 	     }
 	     else {
