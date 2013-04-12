@@ -1,12 +1,12 @@
 $(document).ready(function() {
     
-    game.startGame({ size: 500, player: "both", orientation: "white", label: false });
+    chessBoard.startChessBoard({ size: 500, player: "both", orientation: "white", label: false });
         
 });
 
 
 
-var game = {
+var chessBoard = {
 
     fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
 
@@ -34,7 +34,29 @@ var game = {
 
     label: false,
 
-    startGame: function(params) {
+
+
+
+    
+    /////////////////////////////////////////////////////////////////
+    //
+    //   Functions called once when the board is started or rotated
+    //
+    ///////////////////////////////////////////////////////////////////
+    
+
+    
+    // function called to initialize the board
+    
+    // it will draw a board in a div with id "chessBoardHolder"
+    
+    // it takes as parameters an object with the keys:
+    // size -> size in pixels for the board width and height ( not counting the labels )
+    // player -> 
+    // orientation ->
+    // label ->
+    // fen ->
+    startChessBoard: function(params) {
 
 	 // allows default values 
 	 if ( "fen" in params && params["fen"])
@@ -65,7 +87,7 @@ var game = {
 	 
 	 // allow board rotation
 	 $(document).on("keypress", function() {
-	     game.rotateBoard();
+	     chessBoard.rotateBoard();
 	 });
 
 	 this.drawPieces();
@@ -75,7 +97,7 @@ var game = {
 
 
     prepareTable: function() {
-	 $("body").append("<div id='table'></div>");
+	 $("#chessBoardHolder").append("<div id='table'></div>");
 	 $("#table").css({ width: this.size, height: this.size });
     },
 
@@ -122,25 +144,25 @@ var game = {
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
 	     for ( var i = 0; i < 8; i++ ) {
-		  if ( game.position[columnsName[i]+"8"] === "P" ) {
+		  if ( chessBoard.position[columnsName[i]+"8"] === "P" ) {
 		      var pSq = $(this);
-		      game.position[columnsName[i]+"8"] = pSq.data("piece");
+		      chessBoard.position[columnsName[i]+"8"] = pSq.data("piece");
 		      var square = $("#"+columnsName[i]+"8");
 		      square.children().last().data("piece",  pSq.data("piece"));
 		      square.children().removeClass("P").addClass(pSq.data("piece"));
 		  }
-		  else if ( game.position[columnsName[i]+"1"] === "p" ) {
+		  else if ( chessBoard.position[columnsName[i]+"1"] === "p" ) {
 		      var pSq = $(this);
-		      game.position[columnsName[i]+"1"] = pSq.data("piece");
+		      chessBoard.position[columnsName[i]+"1"] = pSq.data("piece");
 		      var square = $("#"+columnsName[i]+"1");
 		      square.children().last().data("piece",  pSq.data("piece"));
 		      square.children().removeClass("p").addClass(pSq.data("piece"));
 		  }
 	     }
 	     
-	     $("#board").on("click", ".square", game.addBoardEvents);
+	     $("#board").on("click", ".square", chessBoard.addBoardEvents);
 	     // activate deactivate dragging
-	     if ( game.turn === "white" ) {
+	     if ( chessBoard.turn === "white" ) {
 		  $(".piece.white").draggable("enable");
 	     }
 	     else {
@@ -148,12 +170,12 @@ var game = {
 	     }
 	     $("#promotionTable, #whitePromotionTable, #blackPromotionTable").hide();
 	     $(document).on("keypress", function() {
-		  game.rotateBoard();
+		  chessBoard.rotateBoard();
 	     });
 
 	     // update result
-	     game.result = game.getResult();
-	     if ( game.result !== "active" ) {
+	     chessBoard.result = chessBoard.getResult();
+	     if ( chessBoard.result !== "active" ) {
 		  $("#board").off("click", ".square");
 		  $(".piece").draggable("disable");
 	     }
@@ -195,8 +217,8 @@ var game = {
 	 var end = square.attr("id");
 	 var start = selectedSquare.attr("id");
 	 
-	 if ( selectedSquare.length === 1 && game.possibleMoves.indexOf(end) !== -1 ) {
-	     game.movePiece(start, end);
+	 if ( selectedSquare.length === 1 && chessBoard.possibleMoves.indexOf(end) !== -1 ) {
+	     chessBoard.movePiece(start, end);
 	 }
 	 
 
@@ -204,16 +226,16 @@ var game = {
 	 else {
 	     square.children().each( function(){
 		  var piece = $(this);
-		  if ( piece.hasClass("piece") && ( piece.data("color") === game.player || game.player === "both" ) && piece.data("color") === game.turn ) {
+		  if ( piece.hasClass("piece") && ( piece.data("color") === chessBoard.player || chessBoard.player === "both" ) && piece.data("color") === chessBoard.turn ) {
 		      square.addClass("selected");
 		      
 		      // updates "possibleMoves" for selected piece
-		      var nextTurn = game.turn === "white" ? "black" : "white";
+		      var nextTurn = chessBoard.turn === "white" ? "black" : "white";
 		      start = square.attr("id");
 		      
-		      game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(start, game.position),nextTurn);
+		      chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn);
 		      
-		      console.log(game.possibleMoves);
+		      console.log(chessBoard.possibleMoves);
 		  }
 	     });
 	 }
@@ -319,13 +341,13 @@ var game = {
 	     var square = $(this).parent();
 	     
 	     // updates "possibleMoves" for selected piece
-	     var nextTurn = game.turn === "white" ? "black" : "white";
+	     var nextTurn = chessBoard.turn === "white" ? "black" : "white";
 	     var start = square.attr("id");
 	     
-	     game.possibleMoves = game.filterIllegalMoves(start,game.getPossibleMoves(start, game.position),nextTurn);
+	     chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn);
 	     
 	     $(".selected").removeClass("selected");
-	     console.log(game.possibleMoves);
+	     console.log(chessBoard.possibleMoves);
 	 });
 
 	 $("#board").on("dragstop", ".square", function(evt, ui) {
@@ -336,14 +358,14 @@ var game = {
 	     start[0] = start[0].charCodeAt(0)-97;
 	     start[1] = parseInt(start[1]);
 
-	     var end = game.getSquare(ui.position, start);
+	     var end = chessBoard.getSquare(ui.position, start);
 	     
 	     start = columnsName[start[0]]+start[1];
 	     end = columnsName[end[0]]+end[1];
 	    
-	     for ( var i in game.possibleMoves ) {
-		  if ( game.possibleMoves[i] === end ) {
-		      game.movePiece(start, end);
+	     for ( var i in chessBoard.possibleMoves ) {
+		  if ( chessBoard.possibleMoves[i] === end ) {
+		      chessBoard.movePiece(start, end);
 		      break;
 		  }
 	     }
@@ -454,7 +476,7 @@ var game = {
 	 } 
 
 
-	 // game position
+	 // chessBoard position
 	 this.position = this.generateNewPosition(start, end, passant);
 	 
 
@@ -522,73 +544,7 @@ var game = {
 	 
 
 
-    getResult: function() {
-	 
-	 if ( this.turn === "black" ) {
-	     
-	     // black king square
-	     var kingSquare;
-	     for ( var k in this.position ) {
-		  if ( this.position[k] === "k" )
-		      kingSquare = k;
-	     }
-	     
-	     //check if there is a saving move
-	     var moves;
-
-	     for ( var k in this.position ) {
-
-		  // get all the black pieces
-		  if ( this.position[k].toLowerCase() === this.position[k] ) {
-		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "white");
-		      if ( moves.length !== 0 )
-			   return "active";
-		  }
-	     }
-	     
-	     // if black king is attacked
-	     if ( this.areSquaresAttacked([kingSquare],"white",this.position) ) {
-		  return "white";
-	     }
-	     // if king is not attacked
-	     else {
-		  return "draw";
-	     }
-	 }
-
-	 else {
-	     
-	     // white king square
-	     var kingSquare;
-	     for ( var k in this.position ) {
-		  if ( this.position[k] === "K" )
-		      kingSquare = k;
-	     }
-	     
-	     
-	     //check if there is a saving move
-	     var moves;
-
-	     for ( var k in this.position ) {
-		  // get all the white pieces
-		  if ( this.position[k].toUpperCase() === this.position[k] ) {
-		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "black");
-		      if ( moves.length !== 0 )
-			   return "active";
-		  }
-	     }
-	     
-	     
-	     // if black king is attacked
-	     if ( this.areSquaresAttacked([kingSquare],"black",this.position) ) {
-		  return "black";
-	     }
-	     // if king is not attacked
-	     else {
-		  return "draw";
-	     }
-	 }
-    },
+    
 
 
 
@@ -1192,7 +1148,7 @@ var game = {
     // helper function to know if move is illegal
     areSquaresAttacked: function(squares, color,pos) {
 	
-	var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
+	var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 	for ( var sq in squares ) {
 	    
@@ -1468,6 +1424,169 @@ var game = {
 	 // if piece are different
 	 return true;
     },
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //###########################################################
+    //#
+    //# Functions that retrieve information about the game
+    //#
+    //###########################################################
+      
+
+
+    // gets the game result in the board
+    // if it's checkmate returns a string "black" or "white" deopending on who won
+    // if it's a stalemate returns "draw"
+    // draw by repetion not yet implemented
+    // else returns "active"
+
+    getResult: function() {
+	 
+	 if ( this.turn === "black" ) {
+	     
+	     // black king square
+	     var kingSquare;
+	     for ( var k in this.position ) {
+		  if ( this.position[k] === "k" )
+		      kingSquare = k;
+	     }
+	     
+	     //check if there is a saving move
+	     var moves;
+
+	     for ( var k in this.position ) {
+
+		  // get all the black pieces
+		  if ( this.position[k].toLowerCase() === this.position[k] ) {
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "white");
+		      if ( moves.length !== 0 )
+			   return "active";
+		  }
+	     }
+	     
+	     // if black king is attacked
+	     if ( this.areSquaresAttacked([kingSquare],"white",this.position) ) {
+		  return "white";
+	     }
+	     // if king is not attacked
+	     else {
+		  return "draw";
+	     }
+	 }
+
+	 else {
+	     
+	     // white king square
+	     var kingSquare;
+	     for ( var k in this.position ) {
+		  if ( this.position[k] === "K" )
+		      kingSquare = k;
+	     }
+	     
+	     
+	     //check if there is a saving move
+	     var moves;
+
+	     for ( var k in this.position ) {
+		  // get all the white pieces
+		  if ( this.position[k].toUpperCase() === this.position[k] ) {
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "black");
+		      if ( moves.length !== 0 )
+			   return "active";
+		  }
+	     }
+	     
+	     
+	     // if black king is attacked
+	     if ( this.areSquaresAttacked([kingSquare],"black",this.position) ) {
+		  return "black";
+	     }
+	     // if king is not attacked
+	     else {
+		  return "draw";
+	     }
+	 }
+    },
+
+
+
+
+    // returns the fen string representing the game position
+    // moves number not yet implemented
+    getFen: function() {
+	 
+	 var fen = "";
+	 
+	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h"];
+	 
+	 // writes the position
+	 for ( var i = 8; i > 0; i-- ) {
+	     
+	     counter = 0;
+	     for ( var j = 0; j < 8; j++ ) {
+		  
+		  if ( columnsName[j]+i in this.position ) {
+		      if ( counter )
+			   fen += counter;
+		      fen += this.position[columnsName[j]+i];
+		  }
+		  else {
+		      counter += 1;
+		  }
+	     }	  
+	
+	     if ( counter )
+		  fen += counter;
+	     if ( i !== 1) 
+		  fen += "/"	     
+	 } 
+
+	 // writes turn
+	 var turn = this.turn === "white" ? "w" : "b";
+	 fen += " "+turn;
+
+	 // writes castling
+	 fen += " "+this.castling;
+
+	 // writes passant
+	 fen += " "+this.passant;
+
+	 // writes number of moves 
+	 // TODO
+	 fen += " 0 1";
+	 
+	 return fen;
+    }
+
+
+
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //              Helper functions not needed directly
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+
+
+
 }
 
 
