@@ -1,8 +1,29 @@
-$(document).ready(function() {
-    
-    chessBoard.startChessBoard({ size: 500, player: "both", orientation: "white", label: false });
-        
-});
+/*/////////////////////////////////////////////////////////////////
+//
+//   Chess Board API
+//
+///////////////////////////////////////////////////////////////////
+
+chessBoard.startChessBoard(params)  ->   starts the board
+chessBoard.getResult()   ->              gets the game result
+chessBoard.getFen()      ->              gets the fen string for the current position
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -38,24 +59,27 @@ var chessBoard = {
 
 
     
-    /////////////////////////////////////////////////////////////////
-    //
-    //   Functions called once when the board is started or rotated
-    //
-    ///////////////////////////////////////////////////////////////////
     
 
+    ///////////////////////////////////////////////////////////////////////////////
+    //
+    //                   functions from board api
+    //
+    ///////////////////////////////////////////////////////////////////////////////
     
+
+
+
     // function called to initialize the board
     
     // it will draw a board in a div with id "chessBoardHolder"
     
-    // it takes as parameters an object with the keys:
-    // size -> size in pixels for the board width and height ( not counting the labels )
-    // player -> 
-    // orientation ->
-    // label ->
-    // fen ->
+    // it takes as parameters an object with the optionals keys:
+    // size -> size in pixels for the board width and height ( not counting the labels ) - default 400px
+    // player -> pieces that users are allowed to move, "white", "black" or "both", defaults to  white
+    // orientation -> perspective which the board is seen "white" or "black", defaults to white
+    // label -> true or false sets the names of rows and columns, defaults to false
+    // fen -> fen string describing the position, defaults to initial chess position
     startChessBoard: function(params) {
 
 	 // allows default values 
@@ -95,6 +119,150 @@ var chessBoard = {
 	 
     },
 
+
+
+      
+
+
+    // gets the game result in the board
+    // if it's checkmate returns a string "black" or "white" depending on who won
+    // if it's a stalemate returns "draw"
+    // draw by repetion not yet implemented
+    // else returns "active"
+
+    getResult: function() {
+	 
+	 if ( this.turn === "black" ) {
+	     
+	     // black king square
+	     var kingSquare;
+	     for ( var k in this.position ) {
+		  if ( this.position[k] === "k" ) {
+		      kingSquare = k;
+		      break;
+		  }
+	     }
+	     
+	     //check if there is a saving move
+	     var moves;
+
+	     for ( var k in this.position ) {
+
+		  // get all the black pieces
+		  if ( this.position[k].toLowerCase() === this.position[k] ) {
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "white");
+		      if ( moves.length !== 0 )
+			   return "active";
+		  }
+	     }
+	     
+	     // if black king is attacked
+	     if ( this.areSquaresAttacked([kingSquare],"white",this.position) ) {
+		  return "white";
+	     }
+	     // if king is not attacked
+	     else {
+		  return "draw";
+	     }
+	 }
+
+	 else {
+	     
+	     // white king square
+	     var kingSquare;
+	     for ( var k in this.position ) {
+		  if ( this.position[k] === "K" ) {
+		      kingSquare = k;
+		      break;
+		  }
+	     }
+	     
+	     
+	     //check if there is a saving move
+	     var moves;
+
+	     for ( var k in this.position ) {
+		  // get all the white pieces
+		  if ( this.position[k].toUpperCase() === this.position[k] ) {
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "black");
+		      if ( moves.length !== 0 )
+			   return "active";
+		  }
+	     }
+	     
+	     
+	     // if black king is attacked
+	     if ( this.areSquaresAttacked([kingSquare],"black",this.position) ) {
+		  return "black";
+	     }
+	     // if king is not attacked
+	     else {
+		  return "draw";
+	     }
+	 }
+    },
+
+
+
+
+    // returns the fen string representing the game position
+    // moves number not yet implemented
+    getFen: function() {
+	 
+	 var fen = "";
+	 
+	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h"];
+	 
+	 // writes the position
+	 for ( var i = 8; i > 0; i-- ) {
+	     
+	     counter = 0;
+	     for ( var j = 0; j < 8; j++ ) {
+		  
+		  if ( columnsName[j]+i in this.position ) {
+		      if ( counter )
+			   fen += counter;
+		      fen += this.position[columnsName[j]+i];
+		  }
+		  else {
+		      counter += 1;
+		  }
+	     }	  
+	
+	     if ( counter )
+		  fen += counter;
+	     if ( i !== 1) 
+		  fen += "/"	     
+	 } 
+
+	 // writes turn
+	 var turn = this.turn === "white" ? "w" : "b";
+	 fen += " "+turn;
+
+	 // writes castling
+	 fen += " "+this.castling;
+
+	 // writes passant
+	 fen += " "+this.passant;
+
+	 // writes number of moves 
+	 // TODO
+	 fen += " 0 1";
+	 
+	 return fen;
+    },
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //                       helper functions not called directly by the web page
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
 
     prepareTable: function() {
 	 $("#chessBoardHolder").append("<div id='table'></div>");
@@ -266,9 +434,9 @@ var chessBoard = {
 		  // choose square color
 
 		  if ( (i+j)%2 ) 
-		      $(".square").last().addClass("darkBrown");
+		      $(".square").last().addClass("dark");
 		  else
-		      $(".square").last().addClass("lightBrown");
+		      $(".square").last().addClass("light");
 	     }
 		  
 	 }
@@ -1423,7 +1591,7 @@ var chessBoard = {
 
 	 // if piece are different
 	 return true;
-    },
+    }
 
     
 
@@ -1437,153 +1605,6 @@ var chessBoard = {
 
 
 
-
-
-
-
-
-    //###########################################################
-    //#
-    //# Functions that retrieve information about the game
-    //#
-    //###########################################################
-      
-
-
-    // gets the game result in the board
-    // if it's checkmate returns a string "black" or "white" deopending on who won
-    // if it's a stalemate returns "draw"
-    // draw by repetion not yet implemented
-    // else returns "active"
-
-    getResult: function() {
-	 
-	 if ( this.turn === "black" ) {
-	     
-	     // black king square
-	     var kingSquare;
-	     for ( var k in this.position ) {
-		  if ( this.position[k] === "k" )
-		      kingSquare = k;
-	     }
-	     
-	     //check if there is a saving move
-	     var moves;
-
-	     for ( var k in this.position ) {
-
-		  // get all the black pieces
-		  if ( this.position[k].toLowerCase() === this.position[k] ) {
-		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "white");
-		      if ( moves.length !== 0 )
-			   return "active";
-		  }
-	     }
-	     
-	     // if black king is attacked
-	     if ( this.areSquaresAttacked([kingSquare],"white",this.position) ) {
-		  return "white";
-	     }
-	     // if king is not attacked
-	     else {
-		  return "draw";
-	     }
-	 }
-
-	 else {
-	     
-	     // white king square
-	     var kingSquare;
-	     for ( var k in this.position ) {
-		  if ( this.position[k] === "K" )
-		      kingSquare = k;
-	     }
-	     
-	     
-	     //check if there is a saving move
-	     var moves;
-
-	     for ( var k in this.position ) {
-		  // get all the white pieces
-		  if ( this.position[k].toUpperCase() === this.position[k] ) {
-		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "black");
-		      if ( moves.length !== 0 )
-			   return "active";
-		  }
-	     }
-	     
-	     
-	     // if black king is attacked
-	     if ( this.areSquaresAttacked([kingSquare],"black",this.position) ) {
-		  return "black";
-	     }
-	     // if king is not attacked
-	     else {
-		  return "draw";
-	     }
-	 }
-    },
-
-
-
-
-    // returns the fen string representing the game position
-    // moves number not yet implemented
-    getFen: function() {
-	 
-	 var fen = "";
-	 
-	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h"];
-	 
-	 // writes the position
-	 for ( var i = 8; i > 0; i-- ) {
-	     
-	     counter = 0;
-	     for ( var j = 0; j < 8; j++ ) {
-		  
-		  if ( columnsName[j]+i in this.position ) {
-		      if ( counter )
-			   fen += counter;
-		      fen += this.position[columnsName[j]+i];
-		  }
-		  else {
-		      counter += 1;
-		  }
-	     }	  
-	
-	     if ( counter )
-		  fen += counter;
-	     if ( i !== 1) 
-		  fen += "/"	     
-	 } 
-
-	 // writes turn
-	 var turn = this.turn === "white" ? "w" : "b";
-	 fen += " "+turn;
-
-	 // writes castling
-	 fen += " "+this.castling;
-
-	 // writes passant
-	 fen += " "+this.passant;
-
-	 // writes number of moves 
-	 // TODO
-	 fen += " 0 1";
-	 
-	 return fen;
-    }
-
-
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //              Helper functions not needed directly
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
 
 
 

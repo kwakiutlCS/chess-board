@@ -21,23 +21,13 @@
 	height: 12.5%;
 }
 
-.lightBrown {
+.light {
 	background-color: #f1d7b6;
 }
 
-.darkBrown {
+.dark {
 	background-color: rgb(148, 104, 70);
 }
-
-.lightGreen {
-	background-color: #ffffff;
-}
-
-.darkGreen {
-	background-color: rgb(84, 153, 84);
-}
-
-
 
 
 .selected {
