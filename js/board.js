@@ -265,49 +265,49 @@ var chessBoard = {
     
 
     prepareTable: function() {
-	 $("#chessBoardHolder").append("<div id='table'></div>");
-	 $("#table").css({ width: this.size, height: this.size });
+	 $("#chessBoardHolder").append("<div id='chessBoardGameTable'></div>");
+	 $("#chessBoardGameTable").css({ width: this.size, height: this.size });
     },
 
     
     loadBoard: function() {
 	 
-	 $("#table").append("<div id='board'></div>");
+	 $("#chessBoardGameTable").append("<div id='chessBoardGameBoard'></div>");
     
 	 // draw squares
 	 this.drawSquares(this.size/8);
 
 	 // last moves marked on the board
 	 if ( this.lastMoves.length === 2 ) {
-	     $("#"+this.lastMoves[1]).addClass("previousEnd");
-	     $("#"+this.lastMoves[0]).addClass("previousStart");
+	     $("#"+this.lastMoves[1]).addClass("chessBoardPreviousEnd");
+	     $("#"+this.lastMoves[0]).addClass("chessBoardPreviousStart");
 	 }
  
 	 // allow square selection and piece movement
-	 $("#board").on("click", ".square", this.addBoardEvents);
+	 $("#chessBoardGameBoard").on("click", ".chessBoardSquare", this.addBoardEvents);
 	 	 
 	 
     },
 
     preparePromotion: function() {
-	 $("#table").append("<div id='promotionTable' class='text'><div>Promotion</div></div>");
-	 $("#promotionTable").append("<div class='colorPromotionTable' id='whitePromotionTable'></div>");
-	 $("#promotionTable").append("<div class='colorPromotionTable' id='blackPromotionTable'></div>");
+	 $("#chessBoardGameTable").append("<div id='chessBoardPromotionTable' class='chessBoardText'><div>Promotion</div></div>");
+	 $("#chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable' id='whitePromotionTable'></div>");
+	 $("#chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable' id='blackPromotionTable'></div>");
 
-	 $("#whitePromotionTable").append("<div class='promotionSquare' id='whitePromotionQueen' data-piece='Q'></div>");
-	 $("#whitePromotionTable").append("<div class='promotionSquare' id='whitePromotionRook' data-piece='R'></div>");
-	 $("#whitePromotionTable").append("<div class='promotionSquare' id='whitePromotionBishop' data-piece='B'></div>");
-	 $("#whitePromotionTable").append("<div class='promotionSquare' id='whitePromotionKnight' data-piece='N'></div>");
+	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionQueen' data-piece='Q'></div>");
+	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionRook' data-piece='R'></div>");
+	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionBishop' data-piece='B'></div>");
+	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionKnight' data-piece='N'></div>");
 
-	 $("#blackPromotionTable").append("<div class='promotionSquare' id='blackPromotionQueen' data-piece='q'></div>");
-	 $("#blackPromotionTable").append("<div class='promotionSquare' id='blackPromotionRook' data-piece='r'></div>");
-	 $("#blackPromotionTable").append("<div class='promotionSquare' id='blackPromotionBishop' data-piece='b'></div>");
-	 $("#blackPromotionTable").append("<div class='promotionSquare' id='blackPromotionKnight' data-piece='n'></div>");
+	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionQueen' data-piece='q'></div>");
+	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionRook' data-piece='r'></div>");
+	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionBishop' data-piece='b'></div>");
+	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionKnight' data-piece='n'></div>");
 
-	 $("#promotionTable, .colorPromotionTable").hide();
+	 $("#chessBoardPromotionTable, .chessBoardColorPromotionTable").hide();
 
 	 
-	 $("#promotionTable").on('click', '.promotionSquare', function() {
+	 $("#chessBoardPromotionTable").on('click', '.chessBoardPromotionSquare', function() {
 	     
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
@@ -317,26 +317,26 @@ var chessBoard = {
 		      chessBoard.position[columnsName[i]+"8"] = pSq.data("piece");
 		      var square = $("#"+columnsName[i]+"8");
 		      square.children().last().data("piece",  pSq.data("piece"));
-		      square.children().removeClass("P").addClass(pSq.data("piece"));
+		      square.children().removeClass("chessBoardP").addClass("chessBoard"+pSq.data("piece"));
 		  }
 		  else if ( chessBoard.position[columnsName[i]+"1"] === "p" ) {
 		      var pSq = $(this);
 		      chessBoard.position[columnsName[i]+"1"] = pSq.data("piece");
 		      var square = $("#"+columnsName[i]+"1");
 		      square.children().last().data("piece",  pSq.data("piece"));
-		      square.children().removeClass("p").addClass(pSq.data("piece"));
+		      square.children().removeClass("chessBoardp").addClass("chessBoard"+pSq.data("piece"));
 		  }
 	     }
 	     
-	     $("#board").on("click", ".square", chessBoard.addBoardEvents);
+	     $("#chessBoardGameBoard").on("click", ".chessBoardSquare", chessBoard.addBoardEvents);
 	     // activate deactivate dragging
 	     if ( chessBoard.turn === "white" ) {
-		  $(".piece.white").draggable("enable");
+		  $(".chessBoardPiece.white").draggable("enable");
 	     }
 	     else {
-		  $(".piece.black").draggable("enable");
+		  $(".chessBoardPiece.black").draggable("enable");
 	     }
-	     $("#promotionTable, #whitePromotionTable, #blackPromotionTable").hide();
+	     $("#chessBoardPromotionTable, #whitePromotionTable, #blackPromotionTable").hide();
 	     $(document).on("keypress", function() {
 		  chessBoard.rotateBoard();
 	     });
@@ -344,8 +344,8 @@ var chessBoard = {
 	     // update result
 	     chessBoard.result = chessBoard.getResult();
 	     if ( chessBoard.result !== "active" ) {
-		  $("#board").off("click", ".square");
-		  $(".piece").draggable("disable");
+		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
+		  $(".chessBoardPiece").draggable("disable");
 	     }
 	     
 	 });
@@ -356,30 +356,30 @@ var chessBoard = {
 	 
 	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
-	 $("#table").append("<div id='verticalLabel'><div>");
-	 $("#table").append("<div id='horizontalLabel'><div>");
+	 $("#chessBoardGameTable").append("<div id='chessBoardVerticalLabel'><div>");
+	 $("#chessBoardGameTable").append("<div id='chessBoardHorizontalLabel'><div>");
 	     
 	 if ( this.orientation === "white" ) {
 	     for ( var i = 8; i > 0; i--) 
-		  $("#verticalLabel").append("<div class='text verticalLabelSquare'>"+i+"</div>");
+		  $("#chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
 	     for ( var i = 0; i < 8; i++) 
-		  $("#horizontalLabel").append("<div class='text horizontalLabelSquare'>"+columnsName[i]+"</div>");
+		  $("#chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
 	 else {
 	     for ( var i = 1; i < 9; i++) 
-		  $("#verticalLabel").append("<div class='text verticalLabelSquare'>"+i+"</div>");
+		  $("#chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
 	     for ( var i = 7; i >= 0; i--) 
-		  $("#horizontalLabel").append("<div class='text horizontalLabelSquare'>"+columnsName[i]+"</div>");
+		  $("#chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
 
 	 if (!this.label) 
-	     $("#verticalLabel, #horizontalLabel").addClass("hidden");
+	     $("#chessBoardVerticalLabel, #chessBoardHorizontalLabel").addClass("chessBoardHidden");
     },
 
 
     addBoardEvents: function() {
 	 var square = $(this);
-	 var selectedSquare = $(".square.selected");
+	 var selectedSquare = $(".chessBoardSquare.chessBoardSelectedSquare");
 	 
 	 // if piece selected and movement possible, move it
 	 var end = square.attr("id");
@@ -394,8 +394,8 @@ var chessBoard = {
 	 else {
 	     square.children().each( function(){
 		  var piece = $(this);
-		  if ( piece.hasClass("piece") && ( piece.data("color") === chessBoard.player || chessBoard.player === "both" ) && piece.data("color") === chessBoard.turn ) {
-		      square.addClass("selected");
+		  if ( piece.hasClass("chessBoardPiece") && ( piece.data("color") === chessBoard.player || chessBoard.player === "both" ) && piece.data("color") === chessBoard.turn ) {
+		      square.addClass("chessBoardSelectedSquare");
 		      
 		      // updates "possibleMoves" for selected piece
 		      var nextTurn = chessBoard.turn === "white" ? "black" : "white";
@@ -409,7 +409,7 @@ var chessBoard = {
 	 }
 
 	 // remove selections
-	 selectedSquare.removeClass("selected");
+	 selectedSquare.removeClass("chessBoardSelectedSquare");
 	     
     },
 
@@ -424,19 +424,19 @@ var chessBoard = {
 	     
 		  // append a square to the board depending on the orientation
 		  if ( this.orientation === "white" )
-		      $("#board").append("<div class='square' id='"+columnsName[j]+i+"'></div>");
+		      $("#chessBoardGameBoard").append("<div class='chessBoardSquare' id='"+columnsName[j]+i+"'></div>");
 		  else
-		      $("#board").append("<div class='square' id='"+columnsName[7-j]+(9-i)+"'></div>");
+		      $("#chessBoardGameBoard").append("<div class='chessBoardSquare' id='"+columnsName[7-j]+(9-i)+"'></div>");
 
 		  // choose square position
-		  $(".square").last().css( { left:j*squareSize, top: (8-i)*squareSize } );
+		  $(".chessBoardSquare").last().css( { left:j*squareSize, top: (8-i)*squareSize } );
 
 		  // choose square color
 
 		  if ( (i+j)%2 ) 
-		      $(".square").last().addClass("dark");
+		      $(".chessBoardSquare").last().addClass("chessBoardDarkSquare");
 		  else
-		      $(".square").last().addClass("light");
+		      $(".chessBoardSquare").last().addClass("chessBoardLightSquare");
 	     }
 		  
 	 }
@@ -495,17 +495,17 @@ var chessBoard = {
 
 	     // if piece is white
 	     if ( this.position[k].toUpperCase() === this.position[k] )
-		  $("#"+k).append("<div class='piece white "+this.position[k]+"' data-color='white' data-piece='"+this.position[k]+"'></div>");
+		  $("#"+k).append("<div class='chessBoardPiece white chessBoard"+this.position[k]+"' data-color='white' data-piece='"+this.position[k]+"'></div>");
 
 	     // if piece is black
 	     else 
-		  $("#"+k).append("<div class='piece black "+this.position[k]+"' data-color='black' data-piece='"+this.position[k]+"'></div>");
+		  $("#"+k).append("<div class='chessBoardPiece black chessBoard"+this.position[k]+"' data-color='black' data-piece='"+this.position[k]+"'></div>");
 	     
 	 }
 
-	 $(".piece").draggable( { containment: "#board", revert: true, zIndex: 5, revertDuration: 0, distance: 10 } );
+	 $(".chessBoardPiece").draggable( { containment: "#chessBoardGameBoard", revert: true, zIndex: 5, revertDuration: 0, distance: 10 } );
 
-	 $("#board").on("dragstart", ".piece", function() {
+	 $("#chessBoardGameBoard").on("dragstart", ".chessBoardPiece", function() {
 	     var square = $(this).parent();
 	     
 	     // updates "possibleMoves" for selected piece
@@ -514,11 +514,11 @@ var chessBoard = {
 	     
 	     chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn);
 	     
-	     $(".selected").removeClass("selected");
+	     $(".chessBoardSelectedSquare").removeClass("chessBoardSelectedSquare");
 	     console.log(chessBoard.possibleMoves);
 	 });
 
-	 $("#board").on("dragstop", ".square", function(evt, ui) {
+	 $("#chessBoardGameBoard").on("dragstop", ".chessBoardSquare", function(evt, ui) {
 	     
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
@@ -540,9 +540,9 @@ var chessBoard = {
 	 });
 
 	 if ( this.turn === "white" ) 
-	     $(".piece.black").draggable("disable");
+	     $(".chessBoardPiece.black").draggable("disable");
 	 else
-	     $(".piece.white").draggable("disable");
+	     $(".chessBoardPiece.white").draggable("disable");
     },
 
 
@@ -569,8 +569,8 @@ var chessBoard = {
     movePiece: function(start, end) {
 	 
 	 
-	 $(".previousEnd").removeClass("previousEnd");
-	 $(".previousStart").removeClass("previousStart");
+	 $(".chessBoardPreviousEnd").removeClass("chessBoardPreviousEnd");
+	 $(".chessBoardPreviousStart").removeClass("chessBoardPreviousStart");
 	 
 	 this.lastMoves = [start,end];
 
@@ -654,7 +654,7 @@ var chessBoard = {
 	 var start = $("#"+start);
 	 var piece = start.children().each(function() {
 	     var p = $(this);
-	     if ( p.hasClass("piece") )
+	     if ( p.hasClass("chessBoardPiece") )
 		  p.detach();
 	 });
 	 
@@ -671,25 +671,25 @@ var chessBoard = {
 	 // update log
 
 	 // register the move on the board
-	 endSquare.addClass("previousEnd");
-	 start.addClass("previousStart");
+	 endSquare.addClass("chessBoardPreviousEnd");
+	 start.addClass("chessBoardPreviousStart");
 	 
 	 
 	 // activate deactivate dragging
 	 if ( this.turn === "white" ) {
-	     $(".piece.black").draggable("disable");
-	     $(".piece.white").draggable("enable");
+	     $(".chessBoardPiece.black").draggable("disable");
+	     $(".chessBoardPiece.white").draggable("enable");
 	 }
 	 else {
-	     $(".piece.white").draggable("disable");
-	     $(".piece.black").draggable("enable");
+	     $(".chessBoardPiece.white").draggable("disable");
+	     $(".chessBoardPiece.black").draggable("enable");
 	 }
 
 	 // deals with promotions
 	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
-	     $("#board").off("click", ".square");
-	     $(".piece").draggable("disable");
-	     $("#promotionTable").show();
+	     $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
+	     $(".chessBoardPiece").draggable("disable");
+	     $("#chessBoardPromotionTable").show();
 	     
 	     if ( end[1] === "1" ) {
 		  $("#blackPromotionTable").show();
@@ -703,8 +703,8 @@ var chessBoard = {
 	 // update result
 	 this.result = this.getResult();
 	 if ( this.result !== "active" ) {
-	     $("#board").off("click", ".square");
-	     $(".piece").draggable("disable");
+	     $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
+	     $(".chessBoardPiece").draggable("disable");
 	 }
 
 	 
@@ -720,7 +720,7 @@ var chessBoard = {
     rotateBoard: function() {
 	 this.orientation = this.orientation === "white" ? "black" : "white";
 
-	 $("#table").children().remove();
+	 $("#chessBoardGameTable").children().remove();
 
 	 this.loadBoard();
 	 

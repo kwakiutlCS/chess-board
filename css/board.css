@@ -1,4 +1,4 @@
-#table {
+#chessBoardGameTable {
     position: relative;
     margin: auto;
     
@@ -6,7 +6,7 @@
 
 
 
-#board {
+#chessBoardGameBoard {
 	border: 2px solid black;
 	position: relative;
 	width: 100%;
@@ -15,30 +15,30 @@
 }
 
 
-.square {
+.chessBoardSquare {
 	position: absolute;
 	width: 12.5%;
 	height: 12.5%;
 }
 
-.light {
+.chessBoardLightSquare {
 	background-color: #f1d7b6;
 }
 
-.dark {
+.chessBoardDarkSquare {
 	background-color: rgb(148, 104, 70);
 }
 
 
-.selected {
+.chessBoardSelectedSquare {
 	background-color: rgba(139, 207, 64, 0.81);  
 }
 
-.previousEnd {
+.chessBoardPreviousEnd {
 	background-color: rgba(139, 207, 250, 1);  
 }
 
-.previousStart {
+.chessBoardPreviousStart {
 	background-color: rgba(139, 207, 250, 0.5);  
 }
 
@@ -47,7 +47,7 @@
 
 
 
-.piece {
+.chessBoardPiece {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -55,46 +55,46 @@
 }
 
 
-.K {
+.chessBoardK {
     background-image: url('../images/wk.png');
 }
-.Q, #whitePromotionQueen {
+.chessBoardQ, #whitePromotionQueen {
     background-image: url('../images/wq.png');
 }
-.R, #whitePromotionRook {
+.chessBoardR, #whitePromotionRook {
     background-image: url('../images/wr.png');
 }
-.B, #whitePromotionBishop {
+.chessBoardB, #whitePromotionBishop {
     background-image: url('../images/wb.png');
 }
-.N, #whitePromotionKnight {
+.chessBoardN, #whitePromotionKnight {
     background-image: url('../images/wn.png');
 }
-.P {
+.chessBoardP {
     background-image: url('../images/wp.png');
 }
-.k {
+.chessBoardk {
     background-image: url('../images/bk.png');
 }
-.q, #blackPromotionQueen {
+.chessBoardq, #blackPromotionQueen {
     background-image: url('../images/bq.png');
 }
-.b, #blackPromotionBishop {
+.chessBoardb, #blackPromotionBishop {
     background-image: url('../images/bb.png');
 }
-.r, #blackPromotionRook {
+.chessBoardr, #blackPromotionRook {
     background-image: url('../images/br.png');
 }
-.n, #blackPromotionKnight {
+.chessBoardn, #blackPromotionKnight {
     background-image: url('../images/bn.png');
 }
-.p {
+.chessBoardp {
     background-image: url('../images/bp.png');
 }
 
 
 
-#promotionTable {
+#chessBoardPromotionTable {
     width: 240px;
     height: 80px;
     position: relative;
@@ -106,12 +106,12 @@
     font-family: Arial;
 }
 
-.colorPromotionTable {
+.chessBoardColorPromotionTable {
     width: 100%;
     height: 83%;
 }
 
-.promotionSquare {
+.chessBoardPromotionSquare {
     width: 50px;
     height: 50px;
     background-size: 100%;
@@ -121,7 +121,7 @@
 }
 
 
-.text {
+.chessBoardText {
     font-family: arial;
     -webkit-touch-callout: none;
     -webkit-user-select: none;  
@@ -133,7 +133,7 @@
 }
 
 
-#verticalLabel {
+#chessBoardVerticalLabel {
     height: 100%;
     width: 25px;
     position: relative;
@@ -148,7 +148,7 @@
     cursor: default;
 }
 
-#horizontalLabel {
+#chessBoardHorizontalLabel {
     height: 35px;
     width: 100%;
     position: relative;
@@ -164,14 +164,14 @@
     cursor: default;
 }
 
-.verticalLabelSquare {
+.chessBoardVerticalLabelSquare {
     width: 100%;
     height: 12.5%;
     text-align: center;
     
 }
 
-.horizontalLabelSquare {
+.chessBoardHorizontalLabelSquare {
     width: 12.5%;
     height: 100%;
     text-align: center;
@@ -180,6 +180,6 @@
 }
 
 
-.hidden {
+.chessBoardHidden {
     visibility: hidden;
 }
