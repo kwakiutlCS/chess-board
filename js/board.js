@@ -7,7 +7,7 @@
 chessBoard.startChessBoard(params)  ->   starts the board
 chessBoard.getResult()   ->              gets the game result
 chessBoard.getFen()      ->              gets the fen string for the current position
-
+chessBoard.getLastMove() ->              gets the last move played as a string
 
 */
 
@@ -51,7 +51,7 @@ var chessBoard = {
 
     promotionPending: false,
 
-    lastMoves: [],
+    lastMove: [],
 
     label: false,
 
@@ -254,6 +254,13 @@ var chessBoard = {
 
 
 
+    // returns the last move played as a string p.e. "e2 e4"
+    getLastMove: function() {
+	 if ( this.lastMove.length === 0 )
+	     return false;
+	 return this.lastMove.join(" ");
+
+    },
 
 
 
@@ -278,9 +285,9 @@ var chessBoard = {
 	 this.drawSquares(this.size/8);
 
 	 // last moves marked on the board
-	 if ( this.lastMoves.length === 2 ) {
-	     $("#"+this.lastMoves[1]).addClass("chessBoardPreviousEnd");
-	     $("#"+this.lastMoves[0]).addClass("chessBoardPreviousStart");
+	 if ( this.lastMove.length === 2 ) {
+	     $("#"+this.lastMove[1]).addClass("chessBoardPreviousEnd");
+	     $("#"+this.lastMove[0]).addClass("chessBoardPreviousStart");
 	 }
  
 	 // allow square selection and piece movement
@@ -539,9 +546,9 @@ var chessBoard = {
 	     }
 	 });
 
-	 if ( this.turn === "white" ) 
+	 if ( this.turn === "white" || this.player === "white" ) 
 	     $(".chessBoardPiece.black").draggable("disable");
-	 else
+	 if ( this.turn === "black" || this.player === "black" ) 
 	     $(".chessBoardPiece.white").draggable("disable");
     },
 
@@ -572,7 +579,7 @@ var chessBoard = {
 	 $(".chessBoardPreviousEnd").removeClass("chessBoardPreviousEnd");
 	 $(".chessBoardPreviousStart").removeClass("chessBoardPreviousStart");
 	 
-	 this.lastMoves = [start,end];
+	 this.lastMove = [start,end];
 
 	 // board update
 	 
