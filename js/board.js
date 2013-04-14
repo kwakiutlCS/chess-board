@@ -99,7 +99,7 @@ var chessBoard = {
 	 if ( "label" in params )
 	     this.label = params["label"];
 
-	 if ( "lastMove" in params ) {
+	 if ( "lastMove" in params && params["lastMove"] ) {
 	     if ( Object.prototype.toString.call( params["lastMove"] ) === '[object Array]' ) 
 		  this.lastMove = params["lastMove"];
 	     else 
