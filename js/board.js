@@ -80,6 +80,7 @@ var chessBoard = {
     // orientation -> perspective which the board is seen "white" or "black", defaults to white
     // label -> true or false sets the names of rows and columns, defaults to false
     // fen -> fen string describing the position, defaults to initial chess position
+    // lastMove -> array or string describing last move played i.e. ["e2","e4"] or "e2 e4"
     startChessBoard: function(params) {
 
 	 // allows default values 
@@ -97,6 +98,14 @@ var chessBoard = {
 
 	 if ( "label" in params )
 	     this.label = params["label"];
+
+	 if ( "lastMove" in params ) {
+	     if ( Object.prototype.toString.call( params["lastMove"] ) === '[object Array]' ) 
+		  this.lastMove = params["lastMove"];
+	     else 
+		  this.lastMove = params["lastMove"].split(" ");
+	 }
+
 
 	 // gets board and piece position in log
 	 this.getInitialPosition();
