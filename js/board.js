@@ -1,32 +1,3 @@
-/*/////////////////////////////////////////////////////////////////
-//
-//   Chess Board API
-//
-///////////////////////////////////////////////////////////////////
-
-chessBoard.startChessBoard(params)  ->   starts the board
-chessBoard.getResult()              ->   gets the game result
-chessBoard.getFen()                 ->   gets the fen string for the current position
-chessBoard.getLastMove()            ->   gets the last move played as a string
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 var chessBoard = {
 
     fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -574,7 +545,7 @@ var chessBoard = {
 	 var squareSize = this.size/8;
 	 
 	 var dx = parseInt(pos.left/squareSize) + (pos.left%squareSize > squareSize/2 ? 1 : ( pos.left%squareSize < -squareSize/2 ? -1 : 0 ));
-	 var dy = -(parseInt(pos.top/squareSize) + (pos.top%squareSize > squareSize/2 ? 1 : ( pos.top%squareSize < -squareSize/2 ? -1 :0 ))); 
+	 var dy = -(parseInt(pos.top/squareSize) + (pos.top%squareSize > squareSize/2 ? 1 : ( pos.top%squareSize < -squareSize/2 ? -1 : 0 ))); 
 
 	 if ( this.orientation === "black" ) {
 	     dx *= -1;
@@ -700,12 +671,15 @@ var chessBoard = {
 	 // activate deactivate dragging
 	 if ( this.turn === "white" ) {
 	     $(".chessBoardPiece.black").draggable("disable");
-	     $(".chessBoardPiece.white").draggable("enable");
+	     if ( this.player !== "black" )
+		  $(".chessBoardPiece.white").draggable("enable");
 	 }
 	 else {
 	     $(".chessBoardPiece.white").draggable("disable");
-	     $(".chessBoardPiece.black").draggable("enable");
+	     if ( this.player !== "white" )
+		  $(".chessBoardPiece.black").draggable("enable");
 	 }
+	 
 
 	 // deals with promotions
 	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
