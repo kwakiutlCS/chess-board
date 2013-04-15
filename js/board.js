@@ -5,9 +5,9 @@
 ///////////////////////////////////////////////////////////////////
 
 chessBoard.startChessBoard(params)  ->   starts the board
-chessBoard.getResult()   ->              gets the game result
-chessBoard.getFen()      ->              gets the fen string for the current position
-chessBoard.getLastMove() ->              gets the last move played as a string
+chessBoard.getResult()              ->   gets the game result
+chessBoard.getFen()                 ->   gets the fen string for the current position
+chessBoard.getLastMove()            ->   gets the last move played as a string
 
 */
 
@@ -75,9 +75,9 @@ var chessBoard = {
     // it will draw a board in a div with id "chessBoardHolder"
     
     // it takes as parameters an object with the optionals keys:
-    // size -> size in pixels for the board width and height ( not counting the labels ) - default 400px
+    // size -> size in pixels for the board width and height ( not counting the labels ), defaults to 400px
     // player -> pieces that users are allowed to move, "white", "black" or "both", defaults to  white
-    // orientation -> perspective which the board is seen "white" or "black", defaults to white
+    // orientation -> perspective which the board is seen "white" or "black", defaults to player moving perspective
     // label -> true or false sets the names of rows and columns, defaults to false
     // fen -> fen string describing the position, defaults to initial chess position
     // lastMove -> array or string describing last move played i.e. ["e2","e4"] or "e2 e4"
@@ -95,6 +95,8 @@ var chessBoard = {
 
 	 if ( "orientation" in params )
 	     this.orientation = params["orientation"];
+	 else
+	     this.orientation = this.player;
 
 	 if ( "label" in params )
 	     this.label = params["label"];
@@ -364,6 +366,11 @@ var chessBoard = {
 		  $(".chessBoardPiece").draggable("disable");
 	     }
 	     
+	     try {
+		  updatePageAfterChessBoardMove();
+	     }
+	     catch(e) {
+	     }
 	 });
     },
     
@@ -683,8 +690,7 @@ var chessBoard = {
 	 // update turn
 	 this.turn = this.turn === "white" ? "black" : "white";
 
-	 // TODO
-	 // update log
+	 
 
 	 // register the move on the board
 	 endSquare.addClass("chessBoardPreviousEnd");
@@ -715,15 +721,26 @@ var chessBoard = {
 	     $(document).off("keypress");
 	 }
 
-	 
-	 // update result
-	 this.result = this.getResult();
-	 if ( this.result !== "active" ) {
-	     $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
-	     $(".chessBoardPiece").draggable("disable");
-	 }
+	 // no promotion move complete
+	 else {
+	     // update result
+	     this.result = this.getResult();
+	     if ( this.result !== "active" ) {
+		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
+		  $(".chessBoardPiece").draggable("disable");
+	     }
 
+	     try {
+		  updatePageAfterChessBoardMove();
+	     }
+	     catch(e) {
+		 
+	     }
+	 }
 	 
+
+	 // TODO
+	 // update log
     },
 	 
 
@@ -1608,20 +1625,6 @@ var chessBoard = {
 	 // if piece are different
 	 return true;
     }
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
