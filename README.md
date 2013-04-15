@@ -45,9 +45,13 @@ returns the fen string representing the position, currently the number of moves 
 <code>chessBoard.getResult();</code>
 
 returns a string representing the game result
+
 "white"  ->  white delivered checkmate
+
 "black"  ->  black delivered checkmate
+
 "draw"   ->  stalemate
+
 "active" ->  normal move
 
 
@@ -60,7 +64,9 @@ returns a string representing the last move played, like "e2 e4"
 
 <code>
 var updatePageAfterChessBoardMove = function() {
+
   // code to execute
+
 }
 </code>
 

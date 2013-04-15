@@ -26,7 +26,7 @@ var chessBoard = {
 
     label: false,
 
-
+    container: "chessBoardHolder",
 
 
     
@@ -43,8 +43,6 @@ var chessBoard = {
 
     // function called to initialize the board
     
-    // it will draw a board in a div with id "chessBoardHolder"
-    
     // it takes as parameters an object with the optionals keys:
     // size -> size in pixels for the board width and height ( not counting the labels ), defaults to 400px
     // player -> pieces that users are allowed to move, "white", "black" or "both", defaults to  white
@@ -52,6 +50,7 @@ var chessBoard = {
     // label -> true or false sets the names of rows and columns, defaults to false
     // fen -> fen string describing the position, defaults to initial chess position
     // lastMove -> array or string describing last move played i.e. ["e2","e4"] or "e2 e4"
+    // container -> div id where  to put the board, defaults to "chessBoardHolder"
     startChessBoard: function(params) {
 
 	 // allows default values 
@@ -78,6 +77,9 @@ var chessBoard = {
 	     else 
 		  this.lastMove = params["lastMove"].split(" ");
 	 }
+
+	 if ( "container" in params )
+	     this.container = params["container"];
 
 
 	 // gets board and piece position in log
@@ -254,7 +256,7 @@ var chessBoard = {
     
 
     prepareTable: function() {
-	 $("#chessBoardHolder").append("<div id='chessBoardGameTable'></div>");
+	 $("#"+this.container).append("<div id='chessBoardGameTable'></div>");
 	 $("#chessBoardGameTable").css({ width: this.size, height: this.size });
     },
 
