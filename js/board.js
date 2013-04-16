@@ -28,9 +28,9 @@ var chessBoard = {
 
     container: "chessBoardHolder",
 
-
+    type: "game",
     
-    
+    lines: [],
 
     ///////////////////////////////////////////////////////////////////////////////
     //
@@ -80,6 +80,12 @@ var chessBoard = {
 
 	 if ( "container" in params )
 	     this.container = params["container"];
+
+	 if ( "type" in params )
+	     this.type = params["type"];
+
+	 if ( "lines" in params )
+	     this.lines = params["lines"];
 
 
 	 // gets board and piece position in log
@@ -204,8 +210,10 @@ var chessBoard = {
 	     for ( var j = 0; j < 8; j++ ) {
 		  
 		  if ( columnsName[j]+i in this.position ) {
-		      if ( counter )
+		      if ( counter ) {
 			   fen += counter;
+			   counter = 0
+		      }
 		      fen += this.position[columnsName[j]+i];
 		  }
 		  else {
@@ -254,6 +262,12 @@ var chessBoard = {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
     
+
+
+    completePuzzle: function() {
+	 
+    },
+
 
     prepareTable: function() {
 	 $("#"+this.container).append("<div id='chessBoardGameTable'></div>");
@@ -705,6 +719,8 @@ var chessBoard = {
 		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
 		  $(".chessBoardPiece").draggable("disable");
 	     }
+	     
+	     this.completePuzzle();
 
 	     try {
 		  updatePageAfterChessBoardMove();
