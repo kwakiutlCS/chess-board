@@ -32,6 +32,7 @@ var chessBoard = {
     
     lines: [],
 
+
     ///////////////////////////////////////////////////////////////////////////////
     //
     //                   functions from board api
@@ -65,8 +66,8 @@ var chessBoard = {
 
 	 if ( "orientation" in params )
 	     this.orientation = params["orientation"];
-	 else
-	     this.orientation = this.player;
+	 else if ( this.player === "black" )
+	     this.orientation = "black";
 
 	 if ( "label" in params )
 	     this.label = params["label"];
@@ -265,9 +266,72 @@ var chessBoard = {
 
 
     completePuzzle: function() {
+	 var moved = false;
+	 
+	 var newLines = [];
+
+	 // checks if a acceptable move was made
+	 for ( var l in this.lines ) {
+
+	     var line = this.lines[l];
+
+	     if (line[0][0] === this.lastMove[0] && line[0][1] === this.lastMove[1] ) {
+		  
+		  // checks if puzzle is complete
+		  if ( line.length === 1 ) {
+		      this.lines = "solved";
+		      try {
+			   updatePageAfterChessBoardMove();
+		      }
+		      catch(e) {
+			   
+		      }
+		      return;
+		  }
+
+		  // if not completed and not moved, move opponent
+		  if ( !moved ) {
+		      moved = true;
+		      try {
+			   updatePageAfterChessBoardMove();
+		      }
+		      catch(e) {
+		      }
+		      chessBoard.movePiece(line[1][0],line[1][1]);
+		      
+		  }
+		  
+		  // update possible lines
+		  newLines.push(line.slice(2));
+	     }
+	     
+	 }
+
+	 if ( !moved ) {
+	     this.lines = "failed";
+	     try {
+		  updatePageAfterChessBoardMove();
+	     }
+	     catch(e) {
+		  
+	     }
+	     return;
+	 }
+	 this.lines = newLines;
 	 
     },
 
+    
+    getPuzzleResult: function() {
+	 if ( typeof this.lines !== "string" ) {
+	     return "active";
+	 }
+	 else {
+	     return this.lines;
+	 }
+    },
+	 
+    
 
     prepareTable: function() {
 	 $("#"+this.container).append("<div id='chessBoardGameTable'></div>");
@@ -413,7 +477,7 @@ var chessBoard = {
 		      
 		      chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn);
 		      
-		      console.log(chessBoard.possibleMoves);
+		     
 		  }
 	     });
 	 }
@@ -525,7 +589,7 @@ var chessBoard = {
 	     chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn);
 	     
 	     $(".chessBoardSelectedSquare").removeClass("chessBoardSelectedSquare");
-	     console.log(chessBoard.possibleMoves);
+	     
 	 });
 
 	 $("#chessBoardGameBoard").on("dragstop", ".chessBoardSquare", function(evt, ui) {
@@ -577,7 +641,9 @@ var chessBoard = {
     
     
     movePiece: function(start, end) {
-	 
+	 var dt = 0;
+	 if ( this.type === "puzzle" && this.turn !== this.player )
+	     dt = 500;
 	 
 	 $(".chessBoardPreviousEnd").removeClass("chessBoardPreviousEnd");
 	 $(".chessBoardPreviousStart").removeClass("chessBoardPreviousStart");
@@ -599,6 +665,7 @@ var chessBoard = {
 	     }
 
 	 }
+	 
 	 
 	 var passant = this.passant;
 	 // register passant square
@@ -720,14 +787,19 @@ var chessBoard = {
 		  $(".chessBoardPiece").draggable("disable");
 	     }
 	     
-	     this.completePuzzle();
 
-	     try {
-		  updatePageAfterChessBoardMove();
-	     }
-	     catch(e) {
+	     
+	     if (this.type !== "puzzle") {
+		  try {
+		      updatePageAfterChessBoardMove();
+		  }
+		  catch(e) {
 		 
+		  }
 	     }
+
+	     if ( this.type === "puzzle" && this.turn !== this.player )
+		  this.completePuzzle();
 	 }
 	 
 
