@@ -64,7 +64,7 @@ returns a string representing the last move played, like "e2 e4"
   
 <br />  
     
-Code executed after move
+update page after move
 ---
   
 To execute some code after a move is made, the following function should be defined  

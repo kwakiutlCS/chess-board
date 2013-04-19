@@ -101,9 +101,9 @@ var chessBoard = {
 	 this.preparePromotion();
 	 
 	 // allow board rotation
-	 $(document).on("keypress", function() {
+	 /*$(document).on("keypress", function() {
 	     chessBoard.rotateBoard();
-	 });
+	 });*/
 
 	 this.drawPieces();
 
@@ -406,9 +406,9 @@ var chessBoard = {
 		  $(".chessBoardPiece.black").draggable("enable");
 	     }
 	     $("#chessBoardPromotionTable, #whitePromotionTable, #blackPromotionTable").hide();
-	     $(document).on("keypress", function() {
+	     /*$(document).on("keypress", function() {
 		  chessBoard.rotateBoard();
-	     });
+	     });*/
 
 	     // update result
 	     chessBoard.result = chessBoard.getResult();
@@ -798,8 +798,12 @@ var chessBoard = {
 		  }
 	     }
 
-	     if ( this.type === "puzzle" && this.turn !== this.player )
-		  this.completePuzzle();
+	     if ( this.type === "puzzle" && this.turn !== this.player ) {
+		  setTimeout(function() {
+		      chessBoard.completePuzzle();
+		      
+		  },700);
+	     }
 	 }
 	 
 
@@ -1257,7 +1261,8 @@ var chessBoard = {
 
 	     // 2 squares ahead
 	     if ( y === 2 && !( columnsName[x]+"4" in pos ) ) {
-		  possibleMoves.push(columnsName[x]+"4");
+		  if ( typeof this.position[columnsName[x]+"3"] === "undefined")
+		      possibleMoves.push(columnsName[x]+"4");
 	     }
 	     
 	     // 1 square ahead
@@ -1286,7 +1291,8 @@ var chessBoard = {
 
 	     // 2 squares ahead
 	     if ( y === 7 && !( columnsName[x]+"5" in pos ) ) {
-		  possibleMoves.push(columnsName[x]+"5");
+		  if ( typeof this.position[columnsName[x]+"6"] === "undefined")
+		      possibleMoves.push(columnsName[x]+"5");
 	     }
 	     
 	     // 1 square ahead
