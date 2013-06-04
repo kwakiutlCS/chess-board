@@ -722,7 +722,7 @@ var chessBoard = {
 
 
 	 // chessBoard position
-	 this.position = this.generateNewPosition(start, end, passant);
+	 this.position = this.generateNewPosition(start, end, passant, this.position);
 	 
 
 	 // board update
@@ -1333,8 +1333,8 @@ var chessBoard = {
 
 
     // returns a copy of current position after a move
-    generateNewPosition: function(start, end, passant) {
-	 var pos = this.copyPosition(this.position);
+    generateNewPosition: function(start, end, passant,position) {
+	 var pos = this.copyPosition(position);
 	 
 
 	 // replaces piece position
@@ -1407,7 +1407,7 @@ var chessBoard = {
 	    }
 	 
 	    // if king is attacked
-	    var pos = this.generateNewPosition(start,moves[m],this.passant);
+	    var pos = this.generateNewPosition(start,moves[m],this.passant, this.position);
 	    if ( !this.areSquaresAttacked([kingSquare],turn,pos) )
 		possible.push(moves[m]);
 	}
