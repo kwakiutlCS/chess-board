@@ -123,6 +123,17 @@ var chessBoard = {
 
     getResult: function() {
 	 
+	 // return "draw" if bare kings
+	 var draw = true;
+	 for (var k in this.position) {
+	     if (this.position[k].toUpperCase() !== "K") {
+		  draw = false;
+		  break;
+	     }
+	 }
+	 if (draw)
+	     return "draw";
+
 	 if ( this.turn === "black" ) {
 	     
 	     // black king square
