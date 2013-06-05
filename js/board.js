@@ -121,12 +121,12 @@ var chessBoard = {
     // draw by repetion not yet implemented
     // else returns "active"
 
-    getResult: function() {
+    getResult: function(position, turn) {
 	 
 	 // return "draw" if bare kings
 	 var draw = true;
-	 for (var k in this.position) {
-	     if (this.position[k].toUpperCase() !== "K") {
+	 for (var k in position) {
+	     if (position[k].toUpperCase() !== "K") {
 		  draw = false;
 		  break;
 	     }
@@ -134,12 +134,12 @@ var chessBoard = {
 	 if (draw)
 	     return "draw";
 
-	 if ( this.turn === "black" ) {
+	 if (turn === "black") {
 	     
 	     // black king square
 	     var kingSquare;
-	     for ( var k in this.position ) {
-		  if ( this.position[k] === "k" ) {
+	     for (var k in position) {
+		  if (position[k] === "k") {
 		      kingSquare = k;
 		      break;
 		  }
@@ -148,18 +148,18 @@ var chessBoard = {
 	     //check if there is a saving move
 	     var moves;
 
-	     for ( var k in this.position ) {
+	     for ( var k in position ) {
 
 		  // get all the black pieces
-		  if ( this.position[k].toLowerCase() === this.position[k] ) {
-		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "white");
+		  if (position[k].toLowerCase() === position[k] ) {
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, position), "white");
 		      if ( moves.length !== 0 )
 			   return "active";
 		  }
 	     }
 	     
 	     // if black king is attacked
-	     if ( this.areSquaresAttacked([kingSquare],"white",this.position) ) {
+	     if ( this.areSquaresAttacked([kingSquare], "white", position) ) {
 		  return "white";
 	     }
 	     // if king is not attacked
@@ -172,8 +172,8 @@ var chessBoard = {
 	     
 	     // white king square
 	     var kingSquare;
-	     for ( var k in this.position ) {
-		  if ( this.position[k] === "K" ) {
+	     for ( var k in position ) {
+		  if (position[k] === "K" ) {
 		      kingSquare = k;
 		      break;
 		  }
@@ -183,10 +183,10 @@ var chessBoard = {
 	     //check if there is a saving move
 	     var moves;
 
-	     for ( var k in this.position ) {
+	     for ( var k in position ) {
 		  // get all the white pieces
-		  if ( this.position[k].toUpperCase() === this.position[k] ) {
-		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, this.position), "black");
+		  if (position[k].toUpperCase() === position[k] ) {
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, position), "black");
 		      if ( moves.length !== 0 )
 			   return "active";
 		  }
@@ -194,7 +194,7 @@ var chessBoard = {
 	     
 	     
 	     // if black king is attacked
-	     if ( this.areSquaresAttacked([kingSquare],"black",this.position) ) {
+	     if ( this.areSquaresAttacked([kingSquare],"black", position) ) {
 		  return "black";
 	     }
 	     // if king is not attacked
@@ -422,7 +422,7 @@ var chessBoard = {
 	     });*/
 
 	     // update result
-	     chessBoard.result = chessBoard.getResult();
+	     chessBoard.result = chessBoard.getResult(this.position, this.turn);
 	     if ( chessBoard.result !== "active" ) {
 		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
 		  $(".chessBoardPiece").draggable("disable");
@@ -792,7 +792,7 @@ var chessBoard = {
 	 // no promotion move complete
 	 else {
 	     // update result
-	     this.result = this.getResult();
+	     this.result = this.getResult(this.position, this.turn);
 	     if ( this.result !== "active" ) {
 		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
 		  $(".chessBoardPiece").draggable("disable");
