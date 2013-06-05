@@ -121,8 +121,8 @@ var chessBoard = {
     // draw by repetion not yet implemented
     // else returns "active"
 
-    getResult: function(position, turn) {
-	 
+    getResult: function(position, turn, passant) {
+	 console.log(turn);
 	 // return "draw" if bare kings
 	 var draw = true;
 	 for (var k in position) {
@@ -152,8 +152,7 @@ var chessBoard = {
 		  
 		  // get all the black pieces
 		  if (position[k].toLowerCase() === position[k] ) {
-		      
-		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, position), "white");
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, position), "white",position, passant);
 		      
 		      if ( moves.length !== 0 )
 			   return "active";
@@ -188,7 +187,7 @@ var chessBoard = {
 	     for ( var k in position ) {
 		  // get all the white pieces
 		  if (position[k].toUpperCase() === position[k] ) {
-		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, position), "black");
+		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, position), "black", position, passant);
 		      if ( moves.length !== 0 )
 			   return "active";
 		  }
@@ -424,7 +423,7 @@ var chessBoard = {
 	     });*/
 
 	     // update result
-	     chessBoard.result = chessBoard.getResult(this.position, this.turn);
+	     chessBoard.result = chessBoard.getResult(this.position, this.turn, this.passant);
 	     if ( chessBoard.result !== "active" ) {
 		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
 		  $(".chessBoardPiece").draggable("disable");
@@ -488,7 +487,7 @@ var chessBoard = {
 		      var nextTurn = chessBoard.turn === "white" ? "black" : "white";
 		      start = square.attr("id");
 		      
-		      chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn);
+		      chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn, chessBoard.position, chessBoard.passant);
 		      
 		     
 		  }
@@ -599,7 +598,7 @@ var chessBoard = {
 	     var nextTurn = chessBoard.turn === "white" ? "black" : "white";
 	     var start = square.attr("id");
 	     
-	     chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn);
+	     chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn, chessBoard.position, chessBoard.passant);
 	     
 	     $(".chessBoardSelectedSquare").removeClass("chessBoardSelectedSquare");
 	     
@@ -794,7 +793,7 @@ var chessBoard = {
 	 // no promotion move complete
 	 else {
 	     // update result
-	     this.result = this.getResult(this.position, this.turn);
+	     this.result = this.getResult(this.position, this.turn, this.passant);
 	     if ( this.result !== "active" ) {
 		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
 		  $(".chessBoardPiece").draggable("disable");
@@ -1391,20 +1390,20 @@ var chessBoard = {
         
 
     // remove illegal moves from possible moves
-    filterIllegalMoves: function(start,moves,turn) {
-	 	 
+    filterIllegalMoves: function(start,moves,turn,position,passant) {
+	 
 	var possible = [];
 
 	for ( var m in moves ) {
 	    // register king square
-	    if ( this.position[start] === "K" || this.position[start] === "k" ) {
+	    if ( position[start] === "K" || position[start] === "k" ) {
 		var kingSquare = moves[m];
 	    }
 	    else {
 		//if king to watch is white
 		if ( turn === "black" ) {
-		    for ( var k in this.position ) {
-			if ( this.position[k] === "K" ) {
+		    for ( var k in position ) {
+			if ( position[k] === "K" ) {
 			    var kingSquare = k;
 			    break;
 			}
@@ -1412,8 +1411,8 @@ var chessBoard = {
 		}
 		//if king to watch is black
 		else {
-		    for ( var k in this.position ) {
-			if ( this.position[k] === "k" ) {
+		    for ( var k in position ) {
+			if ( position[k] === "k" ) {
 			    var kingSquare = k;
 			    break;
 			}
@@ -1423,7 +1422,7 @@ var chessBoard = {
 	    }
 	 
 	    // if king is attacked
-	    var pos = this.generateNewPosition(start,moves[m],this.passant, this.position);
+	    var pos = this.generateNewPosition(start,moves[m],passant, position);
 	    if ( !this.areSquaresAttacked([kingSquare],turn,pos) )
 		possible.push(moves[m]);
 	}
