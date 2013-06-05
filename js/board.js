@@ -149,10 +149,12 @@ var chessBoard = {
 	     var moves;
 
 	     for ( var k in position ) {
-
+		  
 		  // get all the black pieces
 		  if (position[k].toLowerCase() === position[k] ) {
+		      
 		      moves = this.filterIllegalMoves(k, this.getPossibleMoves(k, position), "white");
+		      
 		      if ( moves.length !== 0 )
 			   return "active";
 		  }
@@ -1347,10 +1349,12 @@ var chessBoard = {
     generateNewPosition: function(start, end, passant,position) {
 	 var pos = this.copyPosition(position);
 	 
-
+	 
 	 // replaces piece position
 	 pos[end] = pos[start];
 	 delete pos[start];
+	 delete pos[undefined];
+	 
 	 
 	 // deletes en passant pawn
 	 if ( end === passant ) {
@@ -1378,6 +1382,7 @@ var chessBoard = {
 	     pos["d8"] = "r";
 	     delete pos["a8"];
 	 }
+	 
 	 
 	 return pos;
     },
