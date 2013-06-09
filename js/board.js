@@ -122,7 +122,14 @@ var chessBoard = {
     // else returns "active"
 
     getResult: function(position, turn, passant) {
-	 console.log(turn);
+	 if (typeof position === "undefined")
+	     position = this.position;
+	 if (typeof turn === "undefined")
+	     turn = this.turn;
+	 if (typeof passant === "undefined")
+	     passant = this.passant;
+	 
+	 
 	 // return "draw" if bare kings
 	 var draw = true;
 	 for (var k in position) {
