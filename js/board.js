@@ -687,9 +687,9 @@ var chessBoard = {
 		  var start = this.lines[localCursor][0];
 		  var end = this.lines[localCursor][1];
 
-		  
 		  localCursor += 1;
 		  
+		  // removes passsant pawn
 		  localPosition[end] = localPosition[start];
 		  delete localPosition[start];
 		  if (end === passant) {
@@ -701,12 +701,35 @@ var chessBoard = {
 		      }
 		  }
 		  
+		  // marks passant square
 		  if (localPosition[end] === "P" && start[1] === "2" && end[1] === "4")
 		      passant = start[0]+"3";
 		  else if (localPosition[start] === "p" && start[1] === "7" && end[1] === "5")
 		      passant = start[0]+"6";
 		  else
 		      passant = "";
+
+		  // solves castling
+		  if (localPosition[end] === "K" && start == "e1") {
+		      if (end == "g1") {
+			   delete localPosition["h1"];
+			   localPosition["f1"] = "R";
+		      }
+		      else {
+			   delete localPosition["a1"];
+			   localPosition["d1"] = "R";
+		      }
+		  }
+		  if (localPosition[end] === "k" && start == "e8") {
+		      if (end == "g8") {
+			   delete localPosition["h8"];
+			   localPosition["f8"] = "r";
+		      }
+		      else {
+			   delete localPosition["a8"];
+			   localPosition["d8"] = "r";
+		      }
+		  }
 	     }
 
 	     var startSquare = $("#"+start);
