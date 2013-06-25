@@ -687,13 +687,7 @@ var chessBoard = {
 		  var start = this.lines[localCursor][0];
 		  var end = this.lines[localCursor][1];
 
-		  if (localPosition[start] === "P" && start[1] === "2" && end[1] === "4")
-		      passant = start[0]+"3";
-		  else if (localPosition[start] === "p" && start[1] === "7" && end[1] === "5")
-		      passant = start[0]+"6";
-		  else
-		      passant = "";
-
+		  
 		  localCursor += 1;
 		  
 		  localPosition[end] = localPosition[start];
@@ -707,6 +701,12 @@ var chessBoard = {
 		      }
 		  }
 		  
+		  if (localPosition[end] === "P" && start[1] === "2" && end[1] === "4")
+		      passant = start[0]+"3";
+		  else if (localPosition[start] === "p" && start[1] === "7" && end[1] === "5")
+		      passant = start[0]+"6";
+		  else
+		      passant = "";
 	     }
 
 	     var startSquare = $("#"+start);
