@@ -403,7 +403,7 @@ var chessBoard = {
 	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionBishop' data-piece='b'></div>");
 	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionKnight' data-piece='n'></div>");
 
-	 $("#chessBoardPromotionTable, .chessBoardColorPromotionTable").hide();
+ $("#chessBoardPromotionTable, .chessBoardColorPromotionTable").hide();
 
 	 
 	 $("#chessBoardPromotionTable").on('click', '.chessBoardPromotionSquare', function() {
@@ -672,6 +672,7 @@ var chessBoard = {
 	 
     },
     
+    // updates board with recorded moves
     moveHistory: function(direction) {
 	 if (this.type === "history") {
 	     this.cursor += direction;
@@ -679,15 +680,32 @@ var chessBoard = {
 		  this.cursor -= direction;
 
 	     var localCursor = 0;
+	     var passant = "";
 	     var localPosition = this.copyPosition(this.position);
 	     
 	     while (localCursor < this.cursor) {
 		  var start = this.lines[localCursor][0];
 		  var end = this.lines[localCursor][1];
+
+		  if (localPosition[start] === "P" && start[1] === "2" && end[1] === "4")
+		      passant = start[0]+"3";
+		  else if (localPosition[start] === "p" && start[1] === "7" && end[1] === "5")
+		      passant = start[0]+"6";
+		  else
+		      passant = "";
+
 		  localCursor += 1;
 		  
 		  localPosition[end] = localPosition[start];
 		  delete localPosition[start];
+		  if (end === passant) {
+		      if (passant[1] === "3") {
+			   delete localPosition[passant[0]+"4"];
+		      }
+		      else {
+			   delete localPosition[passant[0]+"5"];
+		      }
+		  }
 		  
 	     }
 
