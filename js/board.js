@@ -687,11 +687,16 @@ var chessBoard = {
 		  var start = this.lines[localCursor][0];
 		  var end = this.lines[localCursor][1];
 
+		  localPosition[end] = localPosition[start];
+		  delete localPosition[start];
+
+		  // deals with promotion
+		  if (this.lines[localCursor].length === 3)
+		      localPosition[end] = this.lines[localCursor][2]
+		  
 		  localCursor += 1;
 		  
 		  // removes passsant pawn
-		  localPosition[end] = localPosition[start];
-		  delete localPosition[start];
 		  if (end === passant) {
 		      if (passant[1] === "3") {
 			   delete localPosition[passant[0]+"4"];
