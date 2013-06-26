@@ -94,7 +94,7 @@
 
 
 
-#chessBoardPromotionTable {
+.chessBoardPromotionTable {
     width: 240px;
     height: 80px;
     position: relative;

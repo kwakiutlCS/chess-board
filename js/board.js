@@ -389,9 +389,9 @@ var chessBoard = {
     },
 
     preparePromotion: function() {
-	 $("#chessBoardGameTable").append("<div id='chessBoardPromotionTable' class='chessBoardText'><div>Promotion</div></div>");
-	 $("#chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable' id='whitePromotionTable'></div>");
-	 $("#chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable' id='blackPromotionTable'></div>");
+	 $("#chessBoardGameTable").append("<div class='chessBoardPromotionTable chessBoardText'><div>Promotion</div></div>");
+	 $("#chessBoardGameTable").children(".chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable' id='whitePromotionTable'></div>");
+	 $("#chessBoardGameTable").children(".chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable' id='blackPromotionTable'></div>");
 
 	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionQueen' data-piece='Q'></div>");
 	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionRook' data-piece='R'></div>");
@@ -403,10 +403,11 @@ var chessBoard = {
 	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionBishop' data-piece='b'></div>");
 	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionKnight' data-piece='n'></div>");
 
- $("#chessBoardPromotionTable, .chessBoardColorPromotionTable").hide();
+	 $("#chessBoardGameTable").children("#chessBoardPromotionTable").hide();
+	 $(".chessBoardColorPromotionTable").hide();
 
 	 
-	 $("#chessBoardPromotionTable").on('click', '.chessBoardPromotionSquare', function() {
+	 $("#chessBoardGameTable").children(".chessBoardPromotionTable").on('click', '.chessBoardPromotionSquare', function() {
 	     
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
@@ -435,7 +436,8 @@ var chessBoard = {
 	     else {
 		  $(".chessBoardPiece.black").draggable("enable");
 	     }
-	     $("#chessBoardPromotionTable, #whitePromotionTable, #blackPromotionTable").hide();
+	     $("#chessBoardGameTable").children(".chessBoardPromotionTable").hide(); 
+	     $("#whitePromotionTable, #blackPromotionTable").hide();
 	     /*$(document).on("keypress", function() {
 		  chessBoard.rotateBoard();
 	     });*/
@@ -896,7 +898,7 @@ var chessBoard = {
 	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
 	     $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
 	     $(".chessBoardPiece").draggable("disable");
-	     $("#chessBoardPromotionTable").show();
+	     $("#chessBoardGameTable").children(".chessBoardPromotionTable").show();
 	     
 	     if ( end[1] === "1" ) {
 		  $("#blackPromotionTable").show();
