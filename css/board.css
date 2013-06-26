@@ -133,7 +133,7 @@
 }
 
 
-#chessBoardVerticalLabel {
+.chessBoardVerticalLabel {
     height: 100%;
     width: 25px;
     position: relative;
@@ -148,7 +148,7 @@
     cursor: default;
 }
 
-#chessBoardHorizontalLabel {
+.chessBoardHorizontalLabel {
     height: 35px;
     width: 100%;
     position: relative;

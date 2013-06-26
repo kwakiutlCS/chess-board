@@ -460,24 +460,26 @@ var chessBoard = {
 	 
 	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
-	 $("#chessBoardGameTable").append("<div id='chessBoardVerticalLabel'><div>");
-	 $("#chessBoardGameTable").append("<div id='chessBoardHorizontalLabel'><div>");
+	 $("#chessBoardGameTable").append("<div class='chessBoardVerticalLabel'><div>");
+	 $("#chessBoardGameTable").append("<div class='chessBoardHorizontalLabel'><div>");
 	     
 	 if ( this.orientation === "white" ) {
 	     for ( var i = 8; i > 0; i--) 
-		  $("#chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
+		  $("#chessBoardGameTable").children(".chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
 	     for ( var i = 0; i < 8; i++) 
-		  $("#chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
+		  $("#chessBoardGameTable").children(".chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
 	 else {
 	     for ( var i = 1; i < 9; i++) 
-		  $("#chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
+		  $("#chessBoardGameTable").children(".chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
 	     for ( var i = 7; i >= 0; i--) 
-		  $("#chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
+		  $("#chessBoardGameTable").children(".chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
 
-	 if (!this.label) 
-	     $("#chessBoardVerticalLabel, #chessBoardHorizontalLabel").addClass("chessBoardHidden");
+	 if (!this.label) {
+	     $("#chessBoardGameTable").children(".chessBoardHorizontalLabel").addClass("chessBoardHidden");
+	     $("#chessBoardGameTable").children(".chessBoardVerticalLabel").addClass("chessBoardHidden");
+	 }
     },
 
 
