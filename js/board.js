@@ -390,24 +390,24 @@ var chessBoard = {
 
     preparePromotion: function() {
 	 $("#chessBoardGameTable").append("<div class='chessBoardPromotionTable chessBoardText'><div>Promotion</div></div>");
-	 $("#chessBoardGameTable").children(".chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable' id='whitePromotionTable'></div>");
-	 $("#chessBoardGameTable").children(".chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable' id='blackPromotionTable'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable whitePromotionTable'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable blackPromotionTable'></div>");
 
-	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionQueen' data-piece='Q'></div>");
-	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionRook' data-piece='R'></div>");
-	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionBishop' data-piece='B'></div>");
-	 $("#whitePromotionTable").append("<div class='chessBoardPromotionSquare' id='whitePromotionKnight' data-piece='N'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionQueen' data-piece='Q'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionRook' data-piece='R'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionBishop' data-piece='B'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionKnight' data-piece='N'></div>");
 
-	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionQueen' data-piece='q'></div>");
-	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionRook' data-piece='r'></div>");
-	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionBishop' data-piece='b'></div>");
-	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionKnight' data-piece='n'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionQueen' data-piece='q'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionRook' data-piece='r'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionBishop' data-piece='b'></div>");
+	 $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionKnight' data-piece='n'></div>");
 
-	 $("#chessBoardGameTable").children().hide();
+	 $("#chessBoardGameTable > .chessBoardPromotionTable").hide();
 	 $(".chessBoardColorPromotionTable").hide();
 
 	 
-	 $("#chessBoardGameTable").children(".chessBoardPromotionTable").on('click', '.chessBoardPromotionSquare', function() {
+	 $("#chessBoardGameTable > .chessBoardPromotionTable").on('click', '.chessBoardPromotionSquare', function() {
 	     
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
@@ -436,8 +436,8 @@ var chessBoard = {
 	     else {
 		  $(".chessBoardPiece.black").draggable("enable");
 	     }
-	     $("#chessBoardGameTable").children(".chessBoardPromotionTable").hide(); 
-	     $("#whitePromotionTable, #blackPromotionTable").hide();
+	     $("#chessBoardGameTable > .chessBoardPromotionTable").hide(); 
+	     $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable, #chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").hide();
 	     /*$(document).on("keypress", function() {
 		  chessBoard.rotateBoard();
 	     });*/
@@ -467,20 +467,19 @@ var chessBoard = {
 	     
 	 if ( this.orientation === "white" ) {
 	     for ( var i = 8; i > 0; i--) 
-		  $("#chessBoardGameTable").children(".chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
+		  $("#chessBoardGameTable > .chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
 	     for ( var i = 0; i < 8; i++) 
-		  $("#chessBoardGameTable").children(".chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
+		  $("#chessBoardGameTable > .chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
 	 else {
 	     for ( var i = 1; i < 9; i++) 
-		  $("#chessBoardGameTable").children(".chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
+		  $("#chessBoardGameTable > .chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
 	     for ( var i = 7; i >= 0; i--) 
-		  $("#chessBoardGameTable").children(".chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
+		  $("#chessBoardGameTable > .chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
 
 	 if (!this.label) {
-	     $("#chessBoardGameTable").children(".chessBoardHorizontalLabel").addClass("chessBoardHidden");
-	     $("#chessBoardGameTable").children(".chessBoardVerticalLabel").addClass("chessBoardHidden");
+	     $("#chessBoardGameTable > .chessBoardHorizontalLabel, #chessBoardGameTable > .chessBoardVerticalLabel").addClass("chessBoardHidden");
 	 }
     },
 
@@ -898,13 +897,13 @@ var chessBoard = {
 	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
 	     $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
 	     $(".chessBoardPiece").draggable("disable");
-	     $("#chessBoardGameTable").children(".chessBoardPromotionTable").show();
+	     $("#chessBoardGameTable > .chessBoardPromotionTable").show();
 	     
 	     if ( end[1] === "1" ) {
-		  $("#blackPromotionTable").show();
+		  $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").show();
 	     }
 	     else
-		  $("#whitePromotionTable").show();
+		  $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").show();
 	     $(document).off("keypress");
 	 }
 

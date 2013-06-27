@@ -58,16 +58,16 @@
 .chessBoardK {
     background-image: url('../images/wk.png');
 }
-.chessBoardQ, #whitePromotionQueen {
+.chessBoardQ, .whitePromotionQueen {
     background-image: url('../images/wq.png');
 }
-.chessBoardR, #whitePromotionRook {
+.chessBoardR, .whitePromotionRook {
     background-image: url('../images/wr.png');
 }
-.chessBoardB, #whitePromotionBishop {
+.chessBoardB, .whitePromotionBishop {
     background-image: url('../images/wb.png');
 }
-.chessBoardN, #whitePromotionKnight {
+.chessBoardN, .whitePromotionKnight {
     background-image: url('../images/wn.png');
 }
 .chessBoardP {
@@ -76,16 +76,16 @@
 .chessBoardk {
     background-image: url('../images/bk.png');
 }
-.chessBoardq, #blackPromotionQueen {
+.chessBoardq, .blackPromotionQueen {
     background-image: url('../images/bq.png');
 }
-.chessBoardb, #blackPromotionBishop {
+.chessBoardb, .blackPromotionBishop {
     background-image: url('../images/bb.png');
 }
-.chessBoardr, #blackPromotionRook {
+.chessBoardr, .blackPromotionRook {
     background-image: url('../images/br.png');
 }
-.chessBoardn, #blackPromotionKnight {
+.chessBoardn, .blackPromotionKnight {
     background-image: url('../images/bn.png');
 }
 .chessBoardp {
