@@ -403,7 +403,7 @@ var chessBoard = {
 	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionBishop' data-piece='b'></div>");
 	 $("#blackPromotionTable").append("<div class='chessBoardPromotionSquare' id='blackPromotionKnight' data-piece='n'></div>");
 
-	 $("#chessBoardGameTable").children("#chessBoardPromotionTable").hide();
+	 $("#chessBoardGameTable").children().hide();
 	 $(".chessBoardColorPromotionTable").hide();
 
 	 
