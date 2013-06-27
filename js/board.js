@@ -357,14 +357,14 @@ var chessBoard = {
     
 
     prepareTable: function() {
-	 $("#"+this.container).append("<div id='chessBoardGameTable'></div>");
-	 $("#chessBoardGameTable").css({ width: this.size, height: this.size });
+	 $("#"+this.container).append("<div class='chessBoardGameTable'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable").css({ width: this.size, height: this.size });
     },
 
     
     loadBoard: function() {
 	 
-	 $("#chessBoardGameTable").append("<div class='chessBoardGameBoard'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable").append("<div class='chessBoardGameBoard'></div>");
     
 	 // draw squares
 	 this.drawSquares(this.size/8);
@@ -376,9 +376,9 @@ var chessBoard = {
 	 }
  
 	 // allow square selection and piece movement
-	 $("#chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", this.addBoardEvents);
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", this.addBoardEvents);
 	 	 
-	 // exp
+	 
 	 var chessBoard = this;
 	 $("#moveHistoryDiv").on("click",".nextMove", function(){
 	     chessBoard.moveHistory(1);
@@ -389,25 +389,25 @@ var chessBoard = {
     },
 
     preparePromotion: function() {
-	 $("#chessBoardGameTable").append("<div class='chessBoardPromotionTable chessBoardText'><div>Promotion</div></div>");
-	 $("#chessBoardGameTable > .chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable whitePromotionTable'></div>");
-	 $("#chessBoardGameTable > .chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable blackPromotionTable'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable").append("<div class='chessBoardPromotionTable chessBoardText'><div>Promotion</div></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable whitePromotionTable'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable").append("<div class='chessBoardColorPromotionTable blackPromotionTable'></div>");
 
-	 $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionQueen' data-piece='Q'></div>");
-	 $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionRook' data-piece='R'></div>");
-	 $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionBishop' data-piece='B'></div>");
-	 $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionKnight' data-piece='N'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionQueen' data-piece='Q'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionRook' data-piece='R'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionBishop' data-piece='B'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").append("<div class='chessBoardPromotionSquare whitePromotionKnight' data-piece='N'></div>");
 
-	 $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionQueen' data-piece='q'></div>");
-	 $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionRook' data-piece='r'></div>");
-	 $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionBishop' data-piece='b'></div>");
-	 $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionKnight' data-piece='n'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionQueen' data-piece='q'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionRook' data-piece='r'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionBishop' data-piece='b'></div>");
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").append("<div class='chessBoardPromotionSquare blackPromotionKnight' data-piece='n'></div>");
 
-	 $("#chessBoardGameTable > .chessBoardPromotionTable").hide();
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable").hide();
 	 $(".chessBoardColorPromotionTable").hide();
 
 	 
-	 $("#chessBoardGameTable > .chessBoardPromotionTable").on('click', '.chessBoardPromotionSquare', function() {
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable").on('click', '.chessBoardPromotionSquare', function() {
 	     
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
@@ -415,29 +415,29 @@ var chessBoard = {
 		  if ( chessBoard.position[columnsName[i]+"8"] === "P" ) {
 		      var pSq = $(this);
 		      chessBoard.position[columnsName[i]+"8"] = pSq.data("piece");
-		      var square = $("#"+columnsName[i]+"8");
+		      var square = $("#"+this.container+" > .chessBoardGameTable ."+columnsName[i]+"8");
 		      square.children().last().data("piece",  pSq.data("piece"));
 		      square.children().removeClass("chessBoardP").addClass("chessBoard"+pSq.data("piece"));
 		  }
 		  else if ( chessBoard.position[columnsName[i]+"1"] === "p" ) {
 		      var pSq = $(this);
 		      chessBoard.position[columnsName[i]+"1"] = pSq.data("piece");
-		      var square = $("#"+columnsName[i]+"1");
+		      var square = $("#"+this.container+" > .chessBoardGameTable ."+columnsName[i]+"1");
 		      square.children().last().data("piece",  pSq.data("piece"));
 		      square.children().removeClass("chessBoardp").addClass("chessBoard"+pSq.data("piece"));
 		  }
 	     }
 	     
-	     $("#chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", chessBoard.addBoardEvents);
+	     $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", chessBoard.addBoardEvents);
 	     // activate deactivate dragging
 	     if ( chessBoard.turn === "white" ) {
-		  $(".chessBoardPiece.white").draggable("enable");
+		  $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece.white").draggable("enable");
 	     }
 	     else {
-		  $(".chessBoardPiece.black").draggable("enable");
+		  $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece.black").draggable("enable");
 	     }
-	     $("#chessBoardGameTable > .chessBoardPromotionTable").hide(); 
-	     $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable, #chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").hide();
+	     $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable").hide(); 
+	     $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable, #"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").hide();
 	     /*$(document).on("keypress", function() {
 		  chessBoard.rotateBoard();
 	     });*/
@@ -445,8 +445,8 @@ var chessBoard = {
 	     // update result
 	     chessBoard.result = chessBoard.getResult(this.position, this.turn, this.passant);
 	     if ( chessBoard.result !== "active" ) {
-		  $("#chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
-		  $(".chessBoardPiece").draggable("disable");
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
+		  $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece").draggable("disable");
 	     }
 	     
 	     try {
@@ -462,24 +462,24 @@ var chessBoard = {
 	 
 	 var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
-	 $("#chessBoardGameTable").append("<div class='chessBoardVerticalLabel'><div>");
-	 $("#chessBoardGameTable").append("<div class='chessBoardHorizontalLabel'><div>");
+	 $("#"+this.container+" > .chessBoardGameTable").append("<div class='chessBoardVerticalLabel'><div>");
+	 $("#"+this.container+" > .chessBoardGameTable").append("<div class='chessBoardHorizontalLabel'><div>");
 	     
 	 if ( this.orientation === "white" ) {
 	     for ( var i = 8; i > 0; i--) 
-		  $("#chessBoardGameTable > .chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
 	     for ( var i = 0; i < 8; i++) 
-		  $("#chessBoardGameTable > .chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
 	 else {
 	     for ( var i = 1; i < 9; i++) 
-		  $("#chessBoardGameTable > .chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardVerticalLabel").append("<div class='chessBoardText chessBoardVerticalLabelSquare'>"+i+"</div>");
 	     for ( var i = 7; i >= 0; i--) 
-		  $("#chessBoardGameTable > .chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardHorizontalLabel").append("<div class='chessBoardText chessBoardHorizontalLabelSquare'>"+columnsName[i]+"</div>");
 	 }
 
 	 if (!this.label) {
-	     $("#chessBoardGameTable > .chessBoardHorizontalLabel, #chessBoardGameTable > .chessBoardVerticalLabel").addClass("chessBoardHidden");
+	     $("#"+this.container+" > .chessBoardGameTable > .chessBoardHorizontalLabel, #"+this.container+" > .chessBoardGameTable > .chessBoardVerticalLabel").addClass("chessBoardHidden");
 	 }
     },
 
@@ -489,8 +489,8 @@ var chessBoard = {
 	 var selectedSquare = $(".chessBoardSquare.chessBoardSelectedSquare");
 	 
 	 // if piece selected and movement possible, move it
-	 var end = square.attr("id");
-	 var start = selectedSquare.attr("id");
+	 var end = square.data("square");
+	 var start = selectedSquare.data("square");
 	 
 	 if ( selectedSquare.length === 1 && chessBoard.possibleMoves.indexOf(end) !== -1 ) {
 	     chessBoard.movePiece(start, end);
@@ -506,7 +506,7 @@ var chessBoard = {
 		      
 		      // updates "possibleMoves" for selected piece
 		      var nextTurn = chessBoard.turn === "white" ? "black" : "white";
-		      start = square.attr("id");
+		      start = square.data("square");
 		      
 		      chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn, chessBoard.position, chessBoard.passant);
 		      
@@ -534,19 +534,19 @@ var chessBoard = {
 	     
 		  // append a square to the board depending on the orientation
 		  if ( this.orientation === "white" )
-		      $("#chessBoardGameTable > .chessBoardGameBoard").append("<div class='chessBoardSquare' id='"+columnsName[j]+i+"'></div>");
+		      $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").append("<div class='chessBoardSquare "+columnsName[j]+i+"' data-square='"+columnsName[j]+i+"'></div>");
 		  else
-		      $("#chessBoardGameTable > .chessBoardGameBoard").append("<div class='chessBoardSquare' id='"+columnsName[7-j]+(9-i)+"'></div>");
+		      $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").append("<div class='chessBoardSquare "+columnsName[7-j]+(9-i)+"' data-square='"+columnsName[7-j]+(9-i)+"'></div>");
 
 		  // choose square position
-		  $(".chessBoardSquare").last().css( { left:j*squareSize, top: (8-i)*squareSize } );
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard > .chessBoardSquare").last().css( { left:j*squareSize, top: (8-i)*squareSize } );
 
 		  // choose square color
 
 		  if ( (i+j)%2 ) 
-		      $(".chessBoardSquare").last().addClass("chessBoardDarkSquare");
+		      $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard > .chessBoardSquare").last().addClass("chessBoardDarkSquare");
 		  else
-		      $(".chessBoardSquare").last().addClass("chessBoardLightSquare");
+		      $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard > .chessBoardSquare").last().addClass("chessBoardLightSquare");
 	     }
 		  
 	 }
@@ -605,34 +605,34 @@ var chessBoard = {
 
 	     // if piece is white
 	     if ( this.position[k].toUpperCase() === this.position[k] )
-		  $("#"+k).append("<div class='chessBoardPiece white chessBoard"+this.position[k]+"' data-color='white' data-piece='"+this.position[k]+"'></div>");
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard > ."+k).append("<div class='chessBoardPiece white chessBoard"+this.position[k]+"' data-color='white' data-piece='"+this.position[k]+"'></div>");
 
 	     // if piece is black
 	     else 
-		  $("#"+k).append("<div class='chessBoardPiece black chessBoard"+this.position[k]+"' data-color='black' data-piece='"+this.position[k]+"'></div>");
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard > ."+k).append("<div class='chessBoardPiece black chessBoard"+this.position[k]+"' data-color='black' data-piece='"+this.position[k]+"'></div>");
 	     
 	 }
 
-	 $(".chessBoardPiece").draggable( { containment: "#chessBoardGameTable > .chessBoardGameBoard", revert: true, zIndex: 5, revertDuration: 0, distance: 10 } );
+	 $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece").draggable( { containment: "#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard", revert: true, zIndex: 5, revertDuration: 0, distance: 10 } );
 
-	 $("#chessBoardGameTable > .chessBoardGameBoard").on("dragstart", ".chessBoardPiece", function() {
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("dragstart", ".chessBoardPiece", function() {
 	     var square = $(this).parent();
 	     
 	     // updates "possibleMoves" for selected piece
 	     var nextTurn = chessBoard.turn === "white" ? "black" : "white";
-	     var start = square.attr("id");
+	     var start = square.data("square");
 	     
 	     chessBoard.possibleMoves = chessBoard.filterIllegalMoves(start,chessBoard.getPossibleMoves(start, chessBoard.position),nextTurn, chessBoard.position, chessBoard.passant);
 	     
-	     $(".chessBoardSelectedSquare").removeClass("chessBoardSelectedSquare");
+	     $("#"+this.container+" > .chessBoardGameTable .chessBoardSelectedSquare").removeClass("chessBoardSelectedSquare");
 	     
 	 });
 
-	 $("#chessBoardGameTable > .chessBoardGameBoard").on("dragstop", ".chessBoardSquare", function(evt, ui) {
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("dragstop", ".chessBoardSquare", function(evt, ui) {
 	     
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
-	     var start = $(this).attr("id").split("");
+	     var start = $(this).data("square").split("");
 	     start[0] = start[0].charCodeAt(0)-97;
 	     start[1] = parseInt(start[1]);
 
@@ -786,11 +786,11 @@ var chessBoard = {
 	     
 	     // if white
 	     if ( this.position[start] === "P" ) {
-		  $("#"+[end.split("")[0],5].join("")).children().remove();
+		  $("#"+this.container+" > .chessBoardGameTable ."+[end.split("")[0],5].join("")).children().remove();
 	     }
 	     // if black
 	     else {
-		  $("#"+[end.split("")[0],4].join("")).children().remove();
+		  $("#"+this.container+" > .chessBoardGameTable ."+[end.split("")[0],4].join("")).children().remove();
 	     }
 
 	 }
@@ -828,23 +828,23 @@ var chessBoard = {
 	 // castling 
 	 if ( start === "e1" && this.position[start] === "K") {
 	     if ( end === "g1" ) {
-		  var rook = $("#h1").children().last().detach();
-		  $("#f1").append(rook);
+		  var rook = $("#"+this.container+" > .chessBoardGameTable .h1").children().last().detach();
+		  $("#"+this.container+" > .chessBoardGameTable .f1").append(rook);
 	     }
 	     else if ( end === "c1" ) {
-		  var rook = $("#a1").children().last().detach();
-		  $("#d1").append(rook);
+		  var rook = $("#"+this.container+" > .chessBoardGameTable .a1").children().last().detach();
+		  $("#"+this.container+" > .chessBoardGameTable .d1").append(rook);
 	     }
 	     
 	 } 
 	 else if ( start === "e8" && this.position[start] === "k") {
 	     if ( end === "g8" ) {
-		  var rook = $("#h8").children().last().detach();
-		  $("#f8").append(rook);
+		  var rook = $("#"+this.container+" > .chessBoardGameTable .h8").children().last().detach();
+		  $("#"+this.container+" > .chessBoardGameTable .f8").append(rook);
 	     }
 	     else if ( end === "c8" ) {
-		  var rook = $("#a8").children().last().detach();
-		  $("#d8").append(rook);
+		  var rook = $("#"+this.container+" > .chessBoardGameTable .a8").children().last().detach();
+		  $("#"+this.container+" > .chessBoardGameTable .d8").append(rook);
 	     }
 	     
 	 } 
@@ -857,7 +857,7 @@ var chessBoard = {
 	 // board update
 
 	 // normal pick the piece
-	 var start = $("#"+start);
+	 var start = $("#"+this.container+" > .chessBoardGameTable ."+start);
 	 var piece = start.children().each(function() {
 	     var p = $(this);
 	     if ( p.hasClass("chessBoardPiece") )
@@ -865,7 +865,7 @@ var chessBoard = {
 	 });
 	 
 	 // normal drop the piece
-	 var endSquare = $("#"+end);
+	 var endSquare = $("#"+this.container+" > .chessBoardGameTable ."+end);
 	 endSquare.children().remove();
 	 endSquare.append(piece);
 
@@ -882,28 +882,28 @@ var chessBoard = {
 	 
 	 // activate deactivate dragging
 	 if ( this.turn === "white" ) {
-	     $(".chessBoardPiece.black").draggable("disable");
+	     $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece.black").draggable("disable");
 	     if ( this.player !== "black" )
-		  $(".chessBoardPiece.white").draggable("enable");
+		  $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece.white").draggable("enable");
 	 }
 	 else {
-	     $(".chessBoardPiece.white").draggable("disable");
+	     $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece.white").draggable("disable");
 	     if ( this.player !== "white" )
-		  $(".chessBoardPiece.black").draggable("enable");
+		  $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece.black").draggable("enable");
 	 }
 	 
 
 	 // deals with promotions
 	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
-	     $("#chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
-	     $(".chessBoardPiece").draggable("disable");
-	     $("#chessBoardGameTable > .chessBoardPromotionTable").show();
+	     $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
+	     $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece").draggable("disable");
+	     $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable").show();
 	     
 	     if ( end[1] === "1" ) {
-		  $("#chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").show();
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .blackPromotionTable").show();
 	     }
 	     else
-		  $("#chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").show();
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardPromotionTable > .whitePromotionTable").show();
 	     $(document).off("keypress");
 	 }
 
@@ -912,8 +912,8 @@ var chessBoard = {
 	     // update result
 	     this.result = this.getResult(this.position, this.turn, this.passant);
 	     if ( this.result !== "active" ) {
-		  $("#chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
-		  $(".chessBoardPiece").draggable("disable");
+		  $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
+		  $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece").draggable("disable");
 	     }
 	     
 
@@ -950,7 +950,7 @@ var chessBoard = {
     rotateBoard: function() {
 	 this.orientation = this.orientation === "white" ? "black" : "white";
 
-	 $("#chessBoardGameTable").children().remove();
+	 $("#"+this.container+" > .chessBoardGameTable").children().remove();
 
 	 this.loadBoard();
 	 
@@ -966,7 +966,7 @@ var chessBoard = {
     getPossibleMoves: function(square, pos) {
 	 
 	 var possibleMoves = [];
-
+	 
 	 // pieces coordinates
 	 var squareArray = square.split("");
 	 var y, x;
