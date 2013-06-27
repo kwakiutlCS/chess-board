@@ -111,7 +111,7 @@ var chessBoard = {
 
 	 this.drawPieces();
 
-	 
+	 return this;
     },
 
 
@@ -376,7 +376,7 @@ var chessBoard = {
 	 }
  
 	 // allow square selection and piece movement
-	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", this.addBoardEvents);
+	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", this.addBoardEvents(this.container));
 	 	 
 	 
 	 var chessBoard = this;
@@ -428,7 +428,7 @@ var chessBoard = {
 		  }
 	     }
 	     
-	     $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", chessBoard.addBoardEvents);
+	     $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", chessBoard.addBoardEvents(this.container));
 	     // activate deactivate dragging
 	     if ( chessBoard.turn === "white" ) {
 		  $("#"+this.container+" > .chessBoardGameTable .chessBoardPiece.white").draggable("enable");
@@ -484,9 +484,10 @@ var chessBoard = {
     },
 
 
-    addBoardEvents: function() {
+    addBoardEvents: function(c) {
+	 
 	 var square = $(this);
-	 var selectedSquare = $(".chessBoardSquare.chessBoardSelectedSquare");
+	 var selectedSquare = $("#"+this.container+" .chessBoardSquare.chessBoardSelectedSquare");
 	 
 	 // if piece selected and movement possible, move it
 	 var end = square.data("square");
@@ -631,7 +632,7 @@ var chessBoard = {
 	 $("#"+this.container+" > .chessBoardGameTable > .chessBoardGameBoard").on("dragstop", ".chessBoardSquare", function(evt, ui) {
 	     
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
-
+	     
 	     var start = $(this).data("square").split("");
 	     start[0] = start[0].charCodeAt(0)-97;
 	     start[1] = parseInt(start[1]);
@@ -770,6 +771,7 @@ var chessBoard = {
     },
 
     movePiece: function(start, end) {
+	 
 	 var dt = 0;
 	 if ( this.type === "puzzle" && this.turn !== this.player )
 	     dt = 500;
@@ -1827,7 +1829,6 @@ var chessBoard = {
 	 // if piece are different
 	 return true;
     }
-
 
 }
 
