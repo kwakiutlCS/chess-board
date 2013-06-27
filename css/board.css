@@ -6,7 +6,7 @@
 
 
 
-#chessBoardGameBoard {
+.chessBoardGameBoard {
 	border: 2px solid black;
 	position: relative;
 	width: 100%;

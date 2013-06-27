@@ -364,7 +364,7 @@ var chessBoard = {
     
     loadBoard: function() {
 	 
-	 $("#chessBoardGameTable").append("<div id='chessBoardGameBoard'></div>");
+	 $("#chessBoardGameTable").append("<div class='chessBoardGameBoard'></div>");
     
 	 // draw squares
 	 this.drawSquares(this.size/8);
@@ -376,7 +376,7 @@ var chessBoard = {
 	 }
  
 	 // allow square selection and piece movement
-	 $("#chessBoardGameBoard").on("click", ".chessBoardSquare", this.addBoardEvents);
+	 $("#chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", this.addBoardEvents);
 	 	 
 	 // exp
 	 var chessBoard = this;
@@ -428,7 +428,7 @@ var chessBoard = {
 		  }
 	     }
 	     
-	     $("#chessBoardGameBoard").on("click", ".chessBoardSquare", chessBoard.addBoardEvents);
+	     $("#chessBoardGameTable > .chessBoardGameBoard").on("click", ".chessBoardSquare", chessBoard.addBoardEvents);
 	     // activate deactivate dragging
 	     if ( chessBoard.turn === "white" ) {
 		  $(".chessBoardPiece.white").draggable("enable");
@@ -445,7 +445,7 @@ var chessBoard = {
 	     // update result
 	     chessBoard.result = chessBoard.getResult(this.position, this.turn, this.passant);
 	     if ( chessBoard.result !== "active" ) {
-		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
+		  $("#chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
 		  $(".chessBoardPiece").draggable("disable");
 	     }
 	     
@@ -534,9 +534,9 @@ var chessBoard = {
 	     
 		  // append a square to the board depending on the orientation
 		  if ( this.orientation === "white" )
-		      $("#chessBoardGameBoard").append("<div class='chessBoardSquare' id='"+columnsName[j]+i+"'></div>");
+		      $("#chessBoardGameTable > .chessBoardGameBoard").append("<div class='chessBoardSquare' id='"+columnsName[j]+i+"'></div>");
 		  else
-		      $("#chessBoardGameBoard").append("<div class='chessBoardSquare' id='"+columnsName[7-j]+(9-i)+"'></div>");
+		      $("#chessBoardGameTable > .chessBoardGameBoard").append("<div class='chessBoardSquare' id='"+columnsName[7-j]+(9-i)+"'></div>");
 
 		  // choose square position
 		  $(".chessBoardSquare").last().css( { left:j*squareSize, top: (8-i)*squareSize } );
@@ -613,9 +613,9 @@ var chessBoard = {
 	     
 	 }
 
-	 $(".chessBoardPiece").draggable( { containment: "#chessBoardGameBoard", revert: true, zIndex: 5, revertDuration: 0, distance: 10 } );
+	 $(".chessBoardPiece").draggable( { containment: "#chessBoardGameTable > .chessBoardGameBoard", revert: true, zIndex: 5, revertDuration: 0, distance: 10 } );
 
-	 $("#chessBoardGameBoard").on("dragstart", ".chessBoardPiece", function() {
+	 $("#chessBoardGameTable > .chessBoardGameBoard").on("dragstart", ".chessBoardPiece", function() {
 	     var square = $(this).parent();
 	     
 	     // updates "possibleMoves" for selected piece
@@ -628,7 +628,7 @@ var chessBoard = {
 	     
 	 });
 
-	 $("#chessBoardGameBoard").on("dragstop", ".chessBoardSquare", function(evt, ui) {
+	 $("#chessBoardGameTable > .chessBoardGameBoard").on("dragstop", ".chessBoardSquare", function(evt, ui) {
 	     
 	     var columnsName = ["a", "b", "c", "d", "e", "f", "g", "h", ];
 
@@ -895,7 +895,7 @@ var chessBoard = {
 
 	 // deals with promotions
 	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
-	     $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
+	     $("#chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
 	     $(".chessBoardPiece").draggable("disable");
 	     $("#chessBoardGameTable > .chessBoardPromotionTable").show();
 	     
@@ -912,7 +912,7 @@ var chessBoard = {
 	     // update result
 	     this.result = this.getResult(this.position, this.turn, this.passant);
 	     if ( this.result !== "active" ) {
-		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
+		  $("#chessBoardGameTable > .chessBoardGameBoard").off("click", ".chessBoardSquare");
 		  $(".chessBoardPiece").draggable("disable");
 	     }
 	     
