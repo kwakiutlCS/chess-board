@@ -28,7 +28,7 @@ var chessBoard = {
 
     container: "chessBoardHolder",
 
-    moveHistoryContainer: "moveHistoryDiv",
+    moveHistoryContainer: "gameHistoryDiv",
 
     type: "game",
     
@@ -380,10 +380,10 @@ var chessBoard = {
 	 	 
 	 // exp
 	 var chessBoard = this;
-	 $("#moveHistoryDiv").on("click",".nextMove", function(){
+	 $("#"+this.gameHistoryContainer).on("click",".nextMove", function(){
 	     chessBoard.moveHistory(1);
 	 });
-	 $("#moveHistoryDiv").on("click",".previousMove", function(){
+	 $("#"+this.gameHistoryContainer).on("click",".previousMove", function(){
 	     chessBoard.moveHistory(-1);
 	 });
     },
