@@ -28,7 +28,7 @@ var chessBoard = {
 
     container: "chessBoardHolder",
 
-    moveHistoryContainer: "gameHistoryDiv",
+    gameHistoryContainer: "gameHistoryDiv",
 
     type: "game",
     
@@ -674,6 +674,7 @@ var chessBoard = {
     
     // updates board with recorded moves
     moveHistory: function(direction) {
+
 	 if (this.type === "history") {
 	     this.cursor += direction;
 	     if (this.cursor < 0 || this.cursor > this.lines.length)
