@@ -1509,6 +1509,9 @@ var chessBoard = {
 	 
 	var possible = [];
 
+	 if (this.player === "locked")
+	     return possible;
+
 	for ( var m in moves ) {
 	    // register king square
 	    if ( position[start] === "K" || position[start] === "k" ) {
