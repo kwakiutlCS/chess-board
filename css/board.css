@@ -31,8 +31,8 @@
 
 
 .chessBoardSelectedSquare {
-	background-color: rgba(139, 207, 64, 0.81);  
-}
+	background-color: rgba(139, 207, 64, 0.81); 
+	}
 
 .chessBoardPreviousEnd {
 	background-color: rgba(139, 207, 250, 1);  
@@ -182,4 +182,10 @@
 
 .chessBoardHidden {
     visibility: hidden;
+}
+
+
+.chessBoardKeySquare {
+    background-image: url('../images/selection.png');
+    background-size: 100%;
 }

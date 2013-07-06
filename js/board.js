@@ -378,7 +378,7 @@ var chessBoard = {
 	 // allow square selection and piece movement
 	 $("#chessBoardGameBoard").on("click", ".chessBoardSquare", this.addBoardEvents);
 	 	 
-	 // exp
+	 // game replay
 	 var chessBoard = this;
 	 $("#"+this.gameHistoryContainer).on("click",".nextMove", function(){
 	     chessBoard.moveHistory(1);
@@ -513,9 +513,12 @@ var chessBoard = {
 	 }
 
 	 // remove selections
-	 selectedSquare.removeClass("chessBoardSelectedSquare");
+        if (chessBoard.type !== "selection")
+	     selectedSquare.removeClass("chessBoardSelectedSquare");
 
-
+	 if (chessBoard.type === "selection") {
+	     square.toggleClass("keySquare");
+	 }
 	 
 	     
     },
