@@ -517,7 +517,7 @@ var chessBoard = {
 	     selectedSquare.removeClass("chessBoardSelectedSquare");
 
 	 if (chessBoard.type === "selection") {
-	     square.toggleClass("keySquare");
+	     square.toggleClass("chessBoardKeySquare");
 	 }
 	 
 	     

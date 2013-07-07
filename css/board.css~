@@ -188,5 +188,6 @@
 .chessBoardKeySquare {
     background-image: url('../images/selection.png');
     background-size: 100%;
+    z-index: 120;
     
 }
