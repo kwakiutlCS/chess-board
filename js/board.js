@@ -126,6 +126,9 @@ var chessBoard = {
     // else returns "active"
 
     getResult: function(position, turn, passant) {
+	 if (this.type === "opposition")
+	     return "active";
+
 	 if (typeof position === "undefined")
 	     position = this.position;
 	 if (typeof turn === "undefined")
@@ -135,15 +138,16 @@ var chessBoard = {
 	 
 	 
 	 // return "draw" if bare kings
-	 var draw = true;
-	 for (var k in position) {
-	     if (position[k].toUpperCase() !== "K") {
-		  draw = false;
-		  break;
-	     }
-	 }
-	 if (draw)
+	 if (Object.keys(position).length < 3)
 	     return "draw";
+	 else if(Object.keys(position).length === 3) {
+	     for (var k in position) {
+		  if (position[k].toLowerCase() === "b" || position[k].toLowerCase() === "n")
+		      return "draw";
+	     }
+		  
+	 }
+	 
 
 	 if (turn === "black") {
 	     
@@ -1830,6 +1834,34 @@ var chessBoard = {
 
 	 // if piece are different
 	 return true;
+    },
+
+
+    getOppositionResult: function(squares) {
+	 var kingSquare;
+	 
+	 if (this.turn === "white") {
+	     for (var k in this.position) {
+		  if (this.position[k] === "k") {
+		      kingSquare = k;
+		      break;
+		  }
+	     }
+	 }
+	 else {
+	     for (var k in this.position) {
+		  if (this.position[k] === "K") {
+		      kingSquare = k;
+		      break;
+		  }
+	     }
+	 }
+	 
+	 for (var sq in squares) {
+	     if (kingSquare === squares[sq])
+		  return true;
+	 }
+	 return false;
     }
 
 
