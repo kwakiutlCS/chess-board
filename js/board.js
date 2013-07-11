@@ -440,9 +440,7 @@ var chessBoard = {
 		  $(".chessBoardPiece.black").draggable("enable");
 	     }
 	     $("#chessBoardPromotionTable, #whitePromotionTable, #blackPromotionTable").hide();
-	     /*$(document).on("keypress", function() {
-		  chessBoard.rotateBoard();
-	     });*/
+	     
 
 	     // update result
 	     chessBoard.result = chessBoard.getResult(this.position, this.turn, this.passant);
@@ -900,16 +898,31 @@ var chessBoard = {
 
 	 // deals with promotions
 	 if ( (end[1] === "8" && this.position[end] === "P") || (end[1] === "1" && this.position[end] === "p") ) {
-	     $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
-	     $(".chessBoardPiece").draggable("disable");
-	     $("#chessBoardPromotionTable").show();
-	     
-	     if ( end[1] === "1" ) {
-		  $("#blackPromotionTable").show();
+	     // automatic promotion
+	     if (this.player === "white" && end[1] === "1") {
+		  this.position[end] = "q";
+		  var square = $("#"+end);
+		  square.children().last().data("piece",  "q");
+		  square.children().removeClass("chessBoardp").addClass("chessBoardq");
 	     }
-	     else
-		  $("#whitePromotionTable").show();
-	     $(document).off("keypress");
+	     else if (this.player === "black" && end[1] === "8"){
+		  this.position[end] = "Q";
+		  var square = $("#"+end);
+		  square.children().last().data("piece",  "Q");
+		  square.children().removeClass("chessBoardP").addClass("chessBoardQ");
+	     }
+	     else {
+		  $("#chessBoardGameBoard").off("click", ".chessBoardSquare");
+		  $(".chessBoardPiece").draggable("disable");
+		  $("#chessBoardPromotionTable").show();
+	     
+		  if ( end[1] === "1" ) {
+		      $("#blackPromotionTable").show();
+		  }
+		  else
+		      $("#whitePromotionTable").show();
+		  $(document).off("keypress");
+	     }
 	 }
 
 	 // no promotion move complete
@@ -1862,7 +1875,23 @@ var chessBoard = {
 		  return true;
 	 }
 	 return false;
-    }
+    },
+
+    getScore: function(position) {
+	 var pieceValue = {"K":0, "Q":8.5, "R": 4.5, "B":3, "N":2.5, "P":1, "k":0, "q":-8.5, "r": -4.5, "b":-3, "n":-2.5, "p":-1 };  
+	 var score = 0;
+
+	 for (var k in position) {
+	     score += pieceValue[position[k]];
+	 }
+	 return score;
+    },
+
+    lock: function() {
+	 this.player = "locked";
+	 $(".chessBoardPiece").draggable("disable");
+	 	  
+    },
 
 
 }
